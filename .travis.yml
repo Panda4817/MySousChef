@@ -1,4 +1,5 @@
 language: python
 python: 3.8
 install: pip install -r requirements.txt
+install: git clone https://github.com/ddsky/spoonacular-api-clients.git --separate-git-dir python
 script: python manage.py test
