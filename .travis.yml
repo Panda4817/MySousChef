@@ -2,7 +2,7 @@ language: python
 python: 3.8
 install: 
     - pip install -r requirements.txt
-    - git clone https://github.com/ddsky/spoonacular-api-clients.git
+    - git submodule add https://github.com/ddsky/spoonacular-api-clients.git
     - cd spoonacular-api-clients/python
     - python setup.py install
 script: 
