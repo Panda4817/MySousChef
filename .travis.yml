@@ -5,8 +5,5 @@ install:
     - git clone https://github.com/ddsky/spoonacular-api-clients.git
     - cd spoonacular-api-clients/python
     - python setup.py install
-before_script: 
-    - cd
-    - cd Panda4817/mysouschef
 script: 
-    - python manage.py test
+    - cd registration/ && python manage.py test
