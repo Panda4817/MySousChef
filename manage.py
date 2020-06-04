@@ -2,6 +2,11 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from dotenv import load_dotenv
+from pathlib import Path
+
+env_path = Path('C:/Users/Kanta/Documents/CS50_Web/final_project/mysouschef/') / '.env'
+load_dotenv(dotenv_path=env_path)
 
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysouschef.settings')
