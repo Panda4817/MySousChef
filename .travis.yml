@@ -6,4 +6,4 @@ install:
     - cd spoonacular-api-clients/python
     - python setup.py install
 script: 
-    - cd registration/ && python manage.py test
+    - cd && python manage.py test
