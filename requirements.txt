@@ -5,3 +5,4 @@ psycopg2
 psycopg2-binary
 whitenoise
 setuptools
+git+https://github.com/ddsky/spoonacular-api-clients.git --separate-git-dir python
