@@ -5,5 +5,8 @@ install:
     - git submodule add https://github.com/ddsky/spoonacular-api-clients.git
     - cd spoonacular-api-clients/python
     - python setup.py install
+before_script:
+    - cd ..
+    - cd ..
 script: 
     - python manage.py test
