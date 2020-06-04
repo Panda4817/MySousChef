@@ -4,4 +4,4 @@ gunicorn
 psycopg2
 psycopg2-binary
 whitenoise
-git+https://github.com/ddsky/spoonacular-api-clients/trunk/python.git
+setuptools
