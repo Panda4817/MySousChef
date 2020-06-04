@@ -4,4 +4,4 @@ gunicorn
 psycopg2
 psycopg2-binary
 whitenoise
-git+https://github.com/Panda4817/spoonacular-api-clients/tree/dependabot/bundler/ruby/rake-13.0.1/python
+git+https://github.com/ddsky/spoonacular-api-clients/tree/master/python.git
