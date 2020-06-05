@@ -32,11 +32,3 @@ class RecipeClient(object):
         filters = {'ingredients': ',+'.join(ingredients)}
         response = self._get('/recipes/findByIngredients', filters)
         return response
-
-
-# Create your views here.
-def index(request):
-    cli = RecipeClient()
-    r = cli.search_recipes_ingredients(['flour', 'egg'])
-    print(r)
-    return render(request, 'registration/test.html')

@@ -7,5 +7,5 @@ from . import views
 
 # All url routes for views
 urlpatterns = [
-    path("", views.index, name="index"),
+    path("dashboard", views.dashboard, name="dashboard"),
 ]

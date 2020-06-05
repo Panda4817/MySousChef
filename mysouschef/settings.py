@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from django.contrib.messages import constants as messages
 from dotenv import load_dotenv
 
 
@@ -26,7 +27,7 @@ load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -35,13 +36,18 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
-    'django.contrib.admin',
+    'widget_tweaks',
+    'sslserver',
+    'django.contrib.staticfiles',
     'django.contrib.auth',
+    'accounts',
+    'recipes',
+    'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'registration',
+    
+    
 ]
 
 MIDDLEWARE = [
@@ -109,6 +115,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -147,3 +160,6 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 #Spoonacular api key
 API_KEY = os.getenv('API_KEY')
+
+LOGIN_REDIRECT_URL = 'recipes:dashboard'
+LOGOUT_REDIRECT_URL = 'accounts:index'

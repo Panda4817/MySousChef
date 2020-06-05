@@ -1,0 +1,56 @@
+{% extends 'registration/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}
+Login
+{% endblock %}
+
+{% block body %}
+
+<div class="breadcumb-area bg-img bg-overlay" style="background-image: url({% static 'img/bg-img/breadcumb4.jpg' %});">
+    <div class="container h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-12">
+                <div class="breadcumb-text text-center">
+                    <h2>Sign in</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form class="form-signin" method="post">
+    {% csrf_token %}
+    <div class="text-center mb-4">
+    {% if next %}
+        {% if user.is_authenticated %}
+        <p>Your account doesn't have access to this page. To proceed,
+        please login with an account that has access.</p>
+        {% else %}
+        <p>Please login to see this page.</p>
+        {% endif %}
+    {% endif %}
+    {% if form.errors %}
+        <small style="color: red;">Your username and password didn't match. Please try again.</small>
+    {% endif %}
+    </div>
+    
+    <div class="fieldWrapper">
+      <div class="form-label-group">
+        {{ form.username|attr:"class:form-control"|attr:"placeholder:Username"|attr:"autofocus"|attr:"required" }}
+        {{ form.username.label_tag }}
+    </div>
+    </div>
+    
+    <div class="fieldWrapper">
+     <div class="form-label-group">
+        {{ form.password|attr:"class:form-control"|attr:"placeholder:Password"|attr:"required" }}
+        {{ form.password.label_tag }}
+    </div>
+    </div>
+
+    <button class="btn delicious-btn btn-block btn-2" type="submit">Login</button>
+    <input type="hidden" name="next" value="{{ next }}">
+    <p class="text-center mt-4"><a href="{% url 'accounts:password_reset' %}">Forgot password?</a></p>
+  </form>
+{% endblock %}
