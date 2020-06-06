@@ -6,4 +6,4 @@ psycopg2-binary
 whitenoise
 requests
 django-widget-tweaks
-sslserver
+django-sslserver
