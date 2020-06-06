@@ -21,4 +21,6 @@ urlpatterns = [
     path("password_change", views.myPasswordChangeView.as_view(), name="password_change"),
     path("password_change/done", views.password_change_done, name="password_change_done"),
     path("contact", views.contact, name="contact"),
+    path("update_username", views.update_username, name="update_username"),
+    path("update_email", views.update_email, name="update_email"),
 ]

@@ -39,5 +39,26 @@ class ContactForm(forms.Form):
     }))
 
 # Update username form
+class ChangeUsernameForm(forms.ModelForm):
+    username = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'New Username',
+    }), label='New Username', required=True)
+    class Meta:
+        model = User
+        fields = (
+            'username',
+        )
+
 
 # Update email form
+class ChangeEmailForm(forms.ModelForm):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'New Email',
+    }), label='New Email', required=True)
+    class Meta:
+        model = User
+        fields = (
+            'email',
+        )

@@ -1,5 +1,6 @@
 {% extends 'recipes/base.html' %}
 {% load static %}
+{% load widget_tweaks %}
 {% block title %}
 Account
 {% endblock %}
@@ -56,13 +57,22 @@ Account
 
                 <!-- Single Accordian Area -->
                 <div class="panel single-accordion">
-                    <h6><a role="button" class="collapsed aria-expanded="true" aria-controls="collapseOne" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                    <h6><a role="button" class="collapsed" aria-expanded="true" aria-controls="collapseOne" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
                         Update Username
                             <span class="accor-open"><i class="fa fa-plus" aria-hidden="true"></i></span>
                             <span class="accor-close"><i class="fa fa-minus" aria-hidden="true"></i></span>
                             </a></h6>
                     <div id="collapseOne" class="accordion-content collapse">
-                        <form action="#"></form>
+                        <form action="{% url 'accounts:update_username' %}" method='POST' class="form-signin">
+                            {% csrf_token %}
+                            <div class="fieldWrapper">
+                                <div class="form-label-group">
+                                  {{ uform.username }}
+                                  {{ uform.username.label_tag }}
+                                </div>
+                              </div>
+                            <button class="btn btn-block delicious-btn btn-2 text-center" type="submit">Update Username</button>
+                        </form>
                     </div>
                 </div>
 
@@ -76,7 +86,16 @@ Account
                                 </a>
                     </h6>
                     <div id="collapseTwo" class="accordion-content collapse">
-                        <form action="#"></form>
+                        <form action="{% url 'accounts:update_email' %}" method='POST' class="form-signin">
+                            {% csrf_token %}
+                            <div class="fieldWrapper">
+                                <div class="form-label-group">
+                                  {{ eform.email }}
+                                  {{ eform.email.label_tag }}
+                                </div>
+                              </div>
+                            <button class="btn btn-block delicious-btn btn-2 text-center" type="submit">Update Email</button>
+                        </form>
                     </div>
                 </div>
 

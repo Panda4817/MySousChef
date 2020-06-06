@@ -15,7 +15,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
-from django.contrib.auth import login, authenticate, update_session_auth_hash, REDIRECT_FIELD_NAME, get_user_model
+from django.contrib.auth import login, authenticate, update_session_auth_hash, REDIRECT_FIELD_NAME, get_user_model, logout
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm, AuthenticationForm, PasswordResetForm, SetPasswordForm
 from django.contrib.auth.models import User
@@ -30,7 +30,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 
 from .signals import show_login_message, show_logout_message
-from .forms import SignUpForm, ContactForm
+from .forms import SignUpForm, ContactForm, ChangeUsernameForm, ChangeEmailForm
 from .tokens import account_activation_token
 
 
@@ -38,7 +38,10 @@ UserModel = get_user_model()
 
 # Create your views here.
 def index(request):
-    return render(request, 'registration/index.html')
+    if request.user.is_authenticated:
+        return redirect('recipes:dashboard')
+    else:
+        return render(request, 'registration/index.html')
 
 def register(request):
     if request.method == 'POST':
@@ -218,12 +221,53 @@ def password_reset_complete(request):
     return redirect('accounts:login')
 
 
-
-
 @login_required(login_url=reverse_lazy("accounts:login"))
 def account(request):
-    return render(request, 'registration/account.html')
+    uform = ChangeUsernameForm()
+    eform = ChangeEmailForm()
+    context = {
+        'uform': uform,
+        'eform': eform,
+    }
+    return render(request, 'registration/account.html', context)
 
+@login_required(login_url=reverse_lazy("accounts:login"))
+def update_username(request):
+    if request.method == 'POST':
+        form = ChangeUsernameForm(request.POST)
+        if form.is_valid():
+            user = User.objects.get(pk = request.user.id)
+            user.username = form.cleaned_data['username']
+            user.save()
+            messages.success(request, "Username changed successfully!")
+        return redirect('accounts:account')
+    
+    return redirect('accounts:account')
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def update_email(request):
+    if request.method == 'POST':
+        form = ChangeEmailForm(request.POST)
+        if form.is_valid():
+            user = User.objects.get(pk = request.user.id)
+            user.email = form.cleaned_data['email']
+            user.profile.email_confirmed = False
+            user.save()
+            current_site = get_current_site(request)
+            subject = 'Email Changed - Activate Your MySousChef Account again'
+            message = render_to_string('registration/account_activation_email.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': account_activation_token.make_token(user),
+            })
+            user.email_user(subject, message)
+            logout(request)            
+            messages.info(
+                request, "Please confirm your new email address to complete the registration process again.")
+        return redirect('accounts:index')
+    
+    return redirect('accounts:account')
 
 class myPasswordChangeView(myPasswordContextMixin, FormView):
     form_class = PasswordChangeForm
