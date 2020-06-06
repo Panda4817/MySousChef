@@ -31,11 +31,9 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'mysouschef.herokuapp.com']
 
-
 # Application definition
 
 INSTALLED_APPS = [
-    'whitenoise.runserver_nostatic',
     'widget_tweaks',
     'sslserver',
     'django.contrib.staticfiles',
