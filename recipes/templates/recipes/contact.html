@@ -1,0 +1,78 @@
+{% extends 'recipes/base.html' %}
+{% load static %}
+{% block title %}
+Contact Us
+{% endblock %}
+
+{% block body %}
+
+<!-- ##### Breadcumb Area Start ##### -->
+<div class="breadcumb-area bg-img bg-overlay" style="background-image: url({% static 'img/bg-img/breadcumb4.jpg' %});">
+    <div class="container h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-12">
+                <div class="breadcumb-text text-center">
+                    <h2>Contact Us</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ##### Breadcumb Area End ##### -->
+
+<!-- ##### Contact Form Area Start ##### -->
+<div class="contact-area section-padding-0-80 my-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="contact-form-area">
+                    <form action="{% url 'accounts:contact' %}" class="contact-form" method="POST">
+                        {% csrf_token %}
+                        {{ cform.non_field_errors }}
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <div class="fieldWrapper">
+                                {{ cform.name.errors }}
+                                {{ cform.name }}
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <div class="fieldWrapper">
+                                {{ cform.email.errors }}
+                                {{ cform.email }}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <div class="fieldWrapper">
+                            {{ cform.subject.errors }}
+                            {{ cform.subject }}
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <div class="fieldWrapper">
+                            {{ cform.message.errors }}
+                            {{ cform.message }}
+                          </div>
+                        </div>
+                        <div class="form-check">
+                          <div class="fieldWrapper">
+                            {{ cform.cc_myself.errors }}
+                            <label for="{{ form.cc_myself.id_for_label }}">CC yourself?</label>
+                            {{ cform.cc_myself }}
+                          </div>
+                        </div>
+                        <button class="btn delicious-btn btn-block btn-2" type="submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ##### Contact Form Area End ##### -->
+
+{% endblock %}

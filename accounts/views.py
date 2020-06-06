@@ -28,13 +28,63 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db import transaction
 from django.conf import settings
 from django.core.mail import send_mail
+
 from .signals import show_login_message, show_logout_message
+from .forms import SignUpForm, ContactForm
+from .tokens import account_activation_token
+
 
 UserModel = get_user_model()
 
 # Create your views here.
 def index(request):
     return render(request, 'registration/index.html')
+
+def register(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+            current_site = get_current_site(request)
+            subject = 'Activate Your MySousChef Account'
+            message = render_to_string('registration/account_activation_email.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': account_activation_token.make_token(user),
+            })
+            user.email_user(subject, message)
+            messages.info(
+                request, "Please confirm your email address to complete the registration.")
+            return redirect('accounts:index')
+    else:
+        form = SignUpForm()
+    return render(request, 'registration/register.html', {'form': form})
+
+
+# When link in email is clicked, activation process occurs
+def activate(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.profile.email_confirmed = True
+        user.save()
+        login(request, user)
+        messages.info(
+            request, f"Hello { user.username }! Welcome to MySousChef")
+        return redirect('recipes:dashboard')
+
+    else:
+        messages.error(
+            request, "The confirmation link was invalid, possibly because it has already been used.")
+        return redirect('accounts:index')
 
 class myPasswordContextMixin:
     extra_context = None
@@ -170,7 +220,7 @@ def password_reset_complete(request):
 
 
 
-@login_required(login_url="login")
+@login_required(login_url=reverse_lazy("accounts:login"))
 def account(request):
     return render(request, 'registration/account.html')
 
@@ -201,9 +251,37 @@ class myPasswordChangeView(myPasswordContextMixin, FormView):
 
 
 # When password is changed sucessfully, redirects back to account page
-@login_required(login_url="login")
+@login_required(login_url=reverse_lazy("accounts:login"))
 def password_change_done(request):
     messages.info(request, "Your password has been updated.")
     return redirect('accounts:account')
 
 
+def contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+            email = form.cleaned_data['email']
+            cc_myself = form.cleaned_data['cc_myself']
+
+            message_to_send = message + ' from ' + name
+            recipients = [settings.EMAIL_HOST_USER]
+            if cc_myself:
+                recipients.append(email)
+
+            send_mail(subject, message_to_send, email, recipients)
+            messages.info(
+                request, "Thank you for the message. We will get back to you as soon as possible.")
+        if request.user.is_authenticated:
+            return redirect('recipes:dashboard')
+        else:
+            return redirect('accounts:index')
+    
+    form = ContactForm()
+    if request.user.is_authenticated:
+        return render(request, 'recipes/contact.html', {'cform': form})
+    else:
+        return render(request, 'registration/contact.html', {'cform': form})
