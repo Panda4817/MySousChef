@@ -179,28 +179,124 @@
     <footer class="footer-area">
         <div class="container h-100">
             <div class="row h-100">
-                <div class="col-12 h-100 d-flex flex-wrap align-items-center justify-content-between">
+                <div class="col-12 h-100 d-flex flex-wrap align-items-center justify-content-center">
                     <!-- Footer Social Info -->
                     <div class="footer-social-info text-center">
-                        <a href="#">privacy</a>
-                        <a href="#">cookies</i></a>
-                        <a href="#">terms and conditions</a>
-                        <a href="#">Spoonacular API</a>
+                        <a style="cursor: pointer !important;"><span data-toggle="modal" data-target="#p-c">privacy & cookies</span></a>
+                        <a style="cursor: pointer !important;"><span data-toggle="modal" data-target="#t-c">terms & conditions</span></a>
+                        <a href="https://www.heroku.com/policy/salesforce-heroku-msa">Heroku</a>
+                        <a href="https://spoonacular.com/food-api/terms">Spoonacular API</a>
                     </div>
                     <!-- Footer Logo -->
-                    <div class="footer-logo">
+                    <div class="footer-logo m-3">
                         <a href="{% url 'recipes:dashboard' %}"><img src="{% static 'img/core-img/logo.png' %}" alt="logo" width="100px"></a>
                     </div>
                     <!-- Copywrite -->
-                    <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    <small><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
 Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></small>
                 </div>
             </div>
         </div>
     </footer>
     <!-- ##### Footer Area Start ##### -->
-
+    <div class="modal fade" id="t-c">
+        <div class="modal-dialog">
+          <div class="modal-content">
+    
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Terms and Conditions</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+    
+            <!-- Modal body -->
+            <div class="modal-body">
+                <p>By registering you agree for us to store your data in a database and make changes to that data when you update it.</p>
+                <p>By registering with the site you are agreeing to the occasional email about your account.</p>
+                <p>By registering with the site you agree to the privacy and cookies policy. Links are in the footer.</p>
+                <p>By registering you understand what the site does and where it gets its data from. Food data is  from Spoonacular. Links are in the footer.</p>
+                <p>By registering you understand that the data comes from other sources so the site cannot guarantee the accuracy and correctness of the information.</p>
+                <p>By registering you understand that the site is hosted by Heroku and they have their own privacy and cookies policy that you agree to. Links are in the footer.</p>
+                <p>By registering you agree to use the site in such a way so that no harm/damage comes to any servers/computers and its data that is providing the service.</p>
+    
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+    
+          </div>
+        </div>
+      </div>
+    
+      <div class="modal fade" id="p-c">
+        <div class="modal-dialog">
+          <div class="modal-content">
+    
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Privacy and Cookies Policy</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+    
+            <!-- Modal body -->
+            <div class="modal-body">
+                <p>Effective Date: June, 2020</p>
+                <h6>Information collected and how it is used</h6>
+                <p>MySousChef only collects and stores information you provide the site: email address, username, hash of your password and food items you put in your virual pantry.</p>
+                <p>This information is only collected to make the site work. Email, username and hash of your password is used to register and secure your account. The food items in your virtual pantry is part of what the site provides.</p>
+                <h6>Information disclosure</h6>
+                <p>MySousChef won’t transfer information about you to third parties. We won’t sell information about you to a third-party. The site makes no money from providing the service.</p>
+                <p>The information you provide is stored in a database that is provided by Heroku. They have their own privacy and cookies policy. Please read this before registering.</p>
+                <h6>Data controller and processor</h6>
+                <p>The account holder is the controller of thier data as you decide what happens with it. MySousChef processes the data via the database stored with Heroku.</p>
+                <p>Legal bases: Any user data is only processed where the user has given consent to do so by registering with the site and agreeing to the terms and conditions. The data you provide is needed for the service to work.</p>
+                <p>There is no DPO for MySousChef, but if have any concerns, please contact via the contact form.</p>
+                <p>The site does NOT use data to make automated decisions. The site does make the dashboard personalised to that user via that data provided by the user.</p>
+                <h6>Your GDPR rights</h6>
+                <p>The right to be informed: Any processing of your data is done with your consent and knowing.</p>
+                <p>The right of access: Any data that belongs to you and is held by the site is also data you have access to.</p>
+                <p>The right to rectification: You can amend or correct your data at anytime.</p>
+                <p>The right to erasure: You have the right to delete your data.</p>
+                <p>The right to restrict processing: You can halt the data processing while the data is being corrected.</p>
+                <p>The right to data portability: You have the right to ask for your data to be downloaded from the site in a readable format.</p>
+                <p>The right to object: You have the right to stop data processing.</p>
+                <p>Rights related to automated decision making and profiling: You have the right to decide not to be part of automated descision making. This is not an issue with the site.</p>
+                <h6>Public Data</h6>
+                <p>This is a very new site so it is unlikey to pop up in search engines. If it does, no user information should be visible.</p>
+                <h6>Data Storage</h6>
+                <p>As said above, the site is hosted on Heroku.</p>
+                <h6>Third-Party Searches</h6>
+                <p>Everytime you search for a recipe or add an ingredient to the pantry it makes an API call to another site. MySousChef does not control what data third parties collect in cases like this so links to their websites are in the footer.</p>
+                <h6>Cookies</h6>
+                <p>This website only uses one type of cookie: session cookies.</p>
+                <p>Session cookies are temporary cookies that remain in the cookie file of your browser only until your browser is closed. This enables the site to login the user.</p>
+                <p>This session cookie is vital for the site to work properly so by using the site you agree to the use of this cookie.</p>
+                <p>Heroku have their own cookies policy and link to that is in the footer.</p>
+                <p>This privacy and cookies policy only covers MySousChef, not Heroku or the API websites.</p>
+                <h6>Modifying or Deleting your personal information</h6>
+                <p>If you have an account with this site, you can access, modify or delete your account via the accounts page or through the contact form.</p>
+                <p>If you forget your password, you can reset it via the accounts page or contact us via the contact form.</p>
+                <p>If you want to export your data before deleting, use the contact form. After an acoount is deleted, your information and content will be unrecoverable.</p>
+                <h6>Data Security</h6>
+                <p>Heroku uses encryption (HTTPS/TLS) to protect data transmitted to and from the site. However, no data transmission over the Internet is 100% secure, so the site can’t guarantee security. You use the Service at your own risk, and you’re responsible for taking reasonable measures to secure your account.</p>
+                <h6>Email</h6>
+                <p>Sometimes we’ll send you emails about your account, service changes or new policies. You can’t opt out of this type of email (unless you delete your account).</p>
+                <p>The site won’t email you to ask for your password or other account information. If you receive such an email, please contact us via the contact form so it can be investigated.</p>
+                <h6>Changes</h6>
+                <p>If you hold an account with the site, you will be notified about any changes to this policy.</p>
+                <h6>More information</h6>
+                <p>Heroku: <a href="https://www.salesforce.com/company/privacy/" target="_blank">privacy policy</a></p>
+                <p>Heroku: <a href="https://www.salesforce.com/company/privacy/full_privacy/#nav_info" target="_blank">cookie policy</a></p>
+                <p>Heroku: <a href="https://www.heroku.com/policy/salesforce-heroku-msa" target="_blank">terms and conditions</a></p>
+                <p><a href="https://spoonacular.com/food-api/terms" target="_blank">Spoonacular API</a></p>
+                </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+          </div>
+        </div>
+      </div>
 
 </body>
     <!-- ##### All Javascript Files ##### -->
