@@ -43,7 +43,7 @@ class ChangeUsernameForm(forms.ModelForm):
     username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
         'placeholder': 'New Username',
-    }), label='New Username', required=True)
+    }), label='New Username', required=True, help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.")
     class Meta:
         model = User
         fields = (
@@ -56,7 +56,7 @@ class ChangeEmailForm(forms.ModelForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={
         'class': 'form-control',
         'placeholder': 'New Email',
-    }), label='New Email', required=True)
+    }), label='New Email', required=True, help_text="Required")
     class Meta:
         model = User
         fields = (

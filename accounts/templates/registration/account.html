@@ -66,9 +66,10 @@ Account
                         <form action="{% url 'accounts:update_username' %}" method='POST' class="form-signin">
                             {% csrf_token %}
                             <div class="fieldWrapper">
+                                <p><small>{{ uform.username.help_text }}</small></p>
                                 <div class="form-label-group">
-                                  {{ uform.username }}
-                                  {{ uform.username.label_tag }}
+                                    {{ uform.username }}
+                                    {{ uform.username.label_tag }}
                                 </div>
                               </div>
                             <button class="btn btn-block delicious-btn btn-2 text-center" type="submit">Update Username</button>
@@ -89,9 +90,10 @@ Account
                         <form action="{% url 'accounts:update_email' %}" method='POST' class="form-signin">
                             {% csrf_token %}
                             <div class="fieldWrapper">
+                                <p><small>{{ eform.email.help_text }}</small></p>
                                 <div class="form-label-group">
-                                  {{ eform.email }}
-                                  {{ eform.email.label_tag }}
+                                    {{ eform.email }}
+                                    {{ eform.email.label_tag }}
                                 </div>
                               </div>
                             <button class="btn btn-block delicious-btn btn-2 text-center" type="submit">Update Email</button>
