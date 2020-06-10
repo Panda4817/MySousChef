@@ -23,9 +23,27 @@
   padding: 0;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   font-family: "Open Sans", sans-serif;
   font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+header, .main-footer {
+  flex-grow: 0 !important;
+}
+
+main {
+  flex-grow: 2 !important;
+  min-height: 100vh;
 }
 
 h1,
@@ -1203,13 +1221,30 @@ textarea:focus {
   position: relative;
   z-index: 20;
 }
-.receipe-post-search form input {
+.receipe-post-search form input, .receipe-post-search form select, .receipe-post-search form option {
   width: 100%;
   height: 60px;
   background-color: #f3f5f8;
+  font-family: "Open Sans", sans-serif !important;
+  font-size: 14px;
+  padding: 0 10px;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+.receipe-post-search form input:focus, .receipe-post-search form select:focus, .receipe-post-search form span:focus, .receipe-post-search form option:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: #f3f5f8 !important;
+}
+.receipe-post-search form span {
+  background-color: #f3f5f8;
   font-size: 14px;
   padding: 0 20px;
-  border: none;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 @media only screen and (min-width:768px) and (max-width:991px) {
   .receipe-post-search .col-12 {
@@ -1361,7 +1396,7 @@ textarea:focus {
 /* :: 16.0 Footer Area CSS */
 .footer-area {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   width: 100%;
   height: 140px;
   background-color: #ffffff;
@@ -1414,7 +1449,7 @@ textarea:focus {
 
 .follow-us-instagram {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   border-top: 1px solid #dcdcdc;
 }
 .follow-us-instagram h5 {
@@ -1838,6 +1873,185 @@ textarea:focus {
   .form-label-group input:-ms-input-placeholder {
     color: #777;
   }
+}
+#virtualPantry {
+  position: relative;
+  min-height: 100vh;
+  background-color: #f3f5f8;
+}
+#virtualPantry #fridge {
+  min-height: 100vh;
+  border: 5px solid #1c8314 !important;
+  border-radius: 5%;
+}
+#virtualPantry #fridge .row {
+  border: 5px solid #1c8314 !important;
+  min-height: 25vh;
+  border-bottom: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+#virtualPantry #fridge .row#other {
+  border-top: 0 !important;
+}
+@media only screen and (max-width:767px) {
+  #virtualPantry #fridge {
+    margin-bottom: 10px;
+  }
+}
+@media only screen and (min-width:768px) and (max-width:991px) {
+  #virtualPantry #fridge {
+    margin-bottom: 10px;
+  }
+}
+#virtualPantry #top1, #virtualPantry #top2, #virtualPantry #top3 {
+  min-height: 40vh;
+  border: 5px solid #1c8314;
+}
+#virtualPantry #bottom1, #virtualPantry #bottom2, #virtualPantry #bottom3 {
+  min-height: 20vh;
+  border: 5px solid #1c8314;
+}
+#virtualPantry #middle1, #virtualPantry #middle2, #virtualPantry #middle3 {
+  min-height: 40vh;
+}
+@media only screen and (min-width:992px) and (max-width:1199px) {
+  #virtualPantry #middle1 {
+    margin-left: 1px;
+  }
+}
+@media only screen and (min-width:1200px) {
+  #virtualPantry #middle1 {
+    margin-left: 1px;
+  }
+}
+@media only screen and (min-width:992px) and (max-width:1199px) {
+  #virtualPantry #top1, #virtualPantry #bottom1 {
+    margin-left: 1px;
+    border-right: 0 !important;
+  }
+}
+@media only screen and (min-width:1200px) {
+  #virtualPantry #top1, #virtualPantry #bottom1 {
+    margin-left: 1px;
+    border-right: 0 !important;
+  }
+}
+@media only screen and (max-width:767px) {
+  #virtualPantry #top1, #virtualPantry #bottom1 {
+    border-right: 5px solid #1c8314 !important;
+  }
+}
+@media only screen and (min-width:768px) and (max-width:991px) {
+  #virtualPantry #top1, #virtualPantry #bottom1 {
+    border-right: 5px solid #1c8314 !important;
+  }
+}
+#virtualPantry #top2, #virtualPantry #bottom2 {
+  border-right: 0 !important;
+}
+@media only screen and (max-width:767px) {
+  #virtualPantry #top2, #virtualPantry #bottom2 {
+    margin-top: 10px;
+    border-right: 5px solid #1c8314 !important;
+  }
+}
+@media only screen and (min-width:768px) and (max-width:991px) {
+  #virtualPantry #top2, #virtualPantry #bottom2 {
+    margin-top: 10px;
+    border-right: 5px solid #1c8314 !important;
+  }
+}
+@media only screen and (max-width:767px) {
+  #virtualPantry #top3, #virtualPantry #bottom3 {
+    margin-top: 10px;
+  }
+}
+@media only screen and (min-width:768px) and (max-width:991px) {
+  #virtualPantry #top3, #virtualPantry #bottom3 {
+    margin-top: 10px;
+  }
+}
+#virtualPantry .col-lg {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  flex: content;
+}
+
+.draggable {
+  width: fit-content;
+  height: fit-content;
+  float: left;
+  padding: 10px;
+  cursor: pointer;
+  margin: 5px;
+  align-self: flex-end;
+}
+
+.other {
+  background-color: #03c383;
+  color: #141414;
+}
+
+.meat {
+  background-color: lightsalmon;
+  color: #141414;
+}
+
+.produce {
+  background-color: #017351;
+  color: #ffffff;
+}
+
+.frozen {
+  background-color: #26294a;
+  color: #ffffff;
+}
+
+.top1 {
+  background-color: #a12a5e;
+  color: #ffffff;
+}
+
+.top2 {
+  background-color: #ed0345;
+  color: #ffffff;
+}
+
+.top3 {
+  background-color: #fbbf45;
+  color: #141414;
+}
+
+.middle1 {
+  background-color: #022c7d;
+  color: #ffffff;
+}
+
+.middle2 {
+  background-color: #ef6a32;
+  color: #141414;
+}
+
+.middle3 {
+  background-color: #710162;
+  color: #ffffff;
+}
+
+.bottom1 {
+  background-color: #1a1334;
+  color: #ffffff;
+}
+
+.bottom2 {
+  background-color: #aad962;
+  color: #141414;
+}
+
+.bottom3 {
+  background-color: #01545a;
+  color: #ffffff;
 }
 
 /*# sourceMappingURL=style.css.map */

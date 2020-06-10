@@ -1,0 +1,345 @@
+{% extends 'recipes/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}
+MyPantry
+{% endblock %}
+
+{% block body %}
+<div class="breadcumb-area bg-img bg-overlay" style="background-image: url({% static 'img/bg-img/breadcumb3.jpg' %});">
+    <div class="container h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-12">
+                <div class="breadcumb-text text-center">
+                    <h2>MyPantry</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="receipe-post-area section-padding-80">
+
+    <!-- Pantry Items Search and add -->
+    <div class="receipe-post-search">
+        <div class="container">
+            <form method="post" id="addpantryform">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-12 col-lg-4">
+                        <select name="intolerance" id="intolerance" multiple js-placeholder="Select any intolerance(s)">
+                            <option value="0">No intolerance</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Egg">Egg</option>
+                            <option value="Gluten">Gluten</option>
+                            <option value="Grain">Grain</option>
+                            <option value="Peanut">Peanut</option>
+                            <option value="Seafood">Seafood</option>
+                            <option value="Sesame">Sesame</option>
+                            <option value="Shellfish">Shellfish</option>
+                            <option value="Soy">Soy</option>
+                            <option value="Sulfite">Sulfite</option>
+                            <option value="Tree Nut">Tree Nut</option>
+                            <option value="Wheat">Wheat</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-12 col-lg-4">
+                        <div class="input-group mx-auto">
+                            <div class="input-group-prepend"><span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span></div>
+                            <div class="ui-widget">
+                                <input type="search" class="form-control" id="searchinput" name="search" placeholder="Search Ingredients">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <button type="submit" id="pantryadd" formaction="{% url 'recipes:pantry' %}" class="btn delicious-btn btn-block" disabled>Add to Pantry</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container h-100" id="virtualPantry">
+        <div class="row h-100">
+            <div class="col-lg-3" id="fridge">
+                <div id="other" class="pantry row">
+                    {% for item in items %}
+                    {% if item.pantry_item.aisle == "Refrigerated" %}
+                    <div id="item{{ item.pantry_item.id }}" class="other pantry draggable ui-widget-content">
+                        {{ item.pantry_item.name|title}}
+                    </div>
+                    {% endif %}
+                    {% if item.pantry_item.aisle == "Nut butters, Jams, and Honey" %}
+                    <div id="item{{ item.pantry_item.id }}" class="other pantry draggable ui-widget-content">
+                        {{ item.pantry_item.name|title}}
+                    </div>
+                    {% endif %}
+                    {% if item.pantry_item.aisle == "Milk, Eggs, Other Dairy" %}
+                    <div id="item{{ item.pantry_item.id }}" class="other pantry draggable ui-widget-content">
+                        {{ item.pantry_item.name|title}}
+                    </div>
+                    {% endif %}
+                    {% if item.pantry_item.aisle == "Cheese" %}
+                    <div id="item{{ item.pantry_item.id }}" class="other pantry draggable ui-widget-content">
+                        {{ item.pantry_item.name|title}}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    
+                </div>
+                <div id="meat" class="pantry row">
+                    {% for item in items %}
+                    {% if item.pantry_item.aisle == "Meat" %}
+                    <div id="item{{ item.pantry_item.id }}" class="meat pantry draggable ui-widget-content">
+                        {{ item.pantry_item.name|title}}
+                    </div>
+                    {% endif %}
+                    {% if item.pantry_item.aisle == "Seafood" %}
+                    <div id="item{{ item.pantry_item.id }}" class="meat pantry draggable ui-widget-content">
+                        {{ item.pantry_item.name|title}}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                <div id="produce" class="pantry row">
+                    {% for item in items %}
+                    {% if item.pantry_item.aisle == "Produce" %}
+                    <div id="item{{ item.pantry_item.id }}" class="produce pantry draggable ui-widget-content">
+                        {{ item.pantry_item.name|title}}
+                    </div>
+                    {% endif %}
+                    {% endfor %} 
+                </div>
+                <div id="frozen" class="pantry row">
+                    {% for item in items %}
+                    {% if item.pantry_item.aisle == "Frozen" %}
+                    <div id="item{{ item.pantry_item.id }}" class="frozen pantry draggable ui-widget-content">
+                        {{ item.pantry_item.name|title}}
+                    </div>
+                    {% endif %}
+                    {% endfor %}   
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div id="top1" class="pantry col-lg">
+                        {% for item in items %}
+                        {% if item.pantry_item.aisle == "Canned and Jarred" %}
+                        <div id="item{{ item.pantry_item.id }}" class="top1 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div id="top2" class="pantry col-lg">
+                        {% for item in items %}
+                        {% if item.pantry_item.aisle == "Oil, Vinegar, Salad Dressing" %}
+                        <div id="item{{ item.pantry_item.id }}" class="top2 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Condiments" %}
+                        <div id="item{{ item.pantry_item.id }}" class="top2 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Savory Snacks" %}
+                        <div id="item{{ item.pantry_item.id }}" class="top2 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Sweet Snacks" %}
+                        <div id="item{{ item.pantry_item.id }}" class="top2 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Nuts" %}
+                        <div id="item{{ item.pantry_item.id }}" class="top2 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Dried Fruits" %}
+                        <div id="item{{ item.pantry_item.id }}" class="top2 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div id="top3" class="pantry col-lg">
+                        {% for item in items %}
+                        {% if item.pantry_item.aisle == "Pasta and Rice" %}
+                        <div id="item{{ item.pantry_item.id }}" class="top3 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Baking" %}
+                        <div id="item{{ item.pantry_item.id }}" class="top3 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="middle1" class="pantry col-lg">
+                        {% for item in items %}
+                        {% if item.pantry_item.aisle == "Spices and Seasonings" %}
+                        <div id="item{{ item.pantry_item.id }}" class="middle1 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% endfor %}   
+                    </div>
+                    <div id="middle2" class="pantry col-lg">
+                        {% for item in items %}
+                        {% if item.pantry_item.aisle == "Bread" or item.pantry_item.aisle == "Bakery" %}
+                        <div id="item{{ item.pantry_item.id }}" class="middle2 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title }}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Cereal" %}
+                        <div id="item{{ item.pantry_item.id }}" class="middle2 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title }}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Tea and Coffee" %}
+                        <div id="item{{ item.pantry_item.id }}" class="middle2 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title }}
+                        </div>
+                        {% endif %}
+                        {% endfor %}   
+                    </div>
+                    <div id="middle3" class="pantry col-lg">
+                        {% for item in items %}
+                        {% if item.pantry_item.aisle == "Alcoholic Beverages" %}
+                        <div id="item{{ item.pantry_item.id }}" class="middle3 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Beverages" %}
+                        <div id="item{{ item.pantry_item.id }}" class="middle3 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% endfor %}   
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="bottom1" class=" pantry col-lg">
+                        {% for item in items %}
+                        {% if item.pantry_item.aisle == "Gourmet" %}
+                        <div id="item{{ item.pantry_item.id }}" class="bottom1 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Ethnic Foods" %}
+                        <div id="item{{ item.pantry_item.id }}" class="bottom1 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Not in Grocery Store" or item.pantry_item.aisle == "Homemade" %}
+                        <div id="item{{ item.pantry_item.id }}" class="bottom1 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% endfor %}  
+                    </div>
+                    <div id="bottom2" class="pantry col-lg">
+                        {% for item in items %}
+                        {% if item.pantry_item.aisle == "Gluten Free" %}
+                        <div id="item{{ item.pantry_item.id }}" class="bottom2 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Health Foods" %}
+                        <div id="item{{ item.pantry_item.id }}" class="bottom2 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% endfor %} 
+                    </div>
+                    <div id="bottom3" class="pantry col-lg">
+                        {% for item in items %}
+                        {% if item.pantry_item.aisle == "Online" %}
+                        <div id="item{{ item.pantry_item.id }}" class="bottom3 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "Grilling Supplies" %}
+                        <div id="item{{ item.pantry_item.id }}" class="bottom3 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if item.pantry_item.aisle == "" %}
+                        <div id="item{{ item.pantry_item.id }}" class="bottom3 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% if ";" in item.pantry_item.aisle %}
+                        <div id="item{{ item.pantry_item.id }}" class="bottom3 pantry draggable ui-widget-content">
+                            {{ item.pantry_item.name|title}}
+                        </div>
+                        {% endif %}
+                        {% endfor %} 
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+
+
+
+
+
+</div>
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let searchInput = document.querySelector('#searchinput');
+        let addBtn = document.querySelector('#pantryadd');
+        addBtn.disabled = true;
+        let timeout = null;
+        searchInput.addEventListener('input', () => {
+            addBtn.disabled = true;
+            clearTimeout(timeout);
+                if (searchInput.value.length >= 3) {
+                timeout = setTimeout(() => {   
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'recipes:search_ingredients' %}",
+                        data: {
+                            search_input: $('#searchinput').val(),
+                            intolerance: $('#intolerance').val(),
+                        },
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                    }).done(function(data) {
+                        $('#searchinput').autocomplete({source: data.json_list});
+                        document.querySelector('.ui-menu').addEventListener('click', () => {
+                            addBtn.disabled = false;
+                        })
+                        if (data.input_correct == true) {
+                            addBtn.disabled = false;
+                        }
+                        else {
+                            addBtn.disabled = true;
+                        } 
+                    });
+                }, 500);
+            }
+            
+        });
+       
+    
+    });
+    
+
+</script>
+{% endblock %}

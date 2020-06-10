@@ -136,4 +136,10 @@
         $.preventDefault()
     });
 
+    $(".draggable").draggable({
+        snap: true, 
+        snap: ".pantry",
+        snapTolerance: 40
+    });
+
 })(jQuery);

@@ -14,7 +14,9 @@
     <link rel="icon" href="{% static 'img/core-img/favicon.ico' %}">
 
     <!-- Core Stylesheet -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
@@ -89,7 +91,7 @@
                         <div class="classynav">
                             <ul>
                                 <li><a href="{% url 'recipes:dashboard' %}">Home</a></li>
-                                <li><a href="#">MyPantry</a></li>
+                                <li><a href="{% url 'recipes:pantry' %}">MyPantry</a></li>
                                 <li><a href="#">Search Recipes</a></li>
                                 <li><a href="#">MyMealPlanner</a></li>
                                 <li><a href="#">MyShoppingList</a></li>
@@ -134,6 +136,7 @@
     </main>
 
     <!-- ##### footer picture area ##### -->
+<div class="main-footer">
     <div class="follow-us-instagram">
         <!-- Instagram Feeds -->
         <div class="insta-feeds d-flex flex-wrap">
@@ -199,6 +202,7 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
             </div>
         </div>
     </footer>
+</div>
     <!-- ##### Footer Area Start ##### -->
     <div class="modal fade" id="t-c">
         <div class="modal-dialog">
@@ -301,10 +305,14 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 </body>
     <!-- ##### All Javascript Files ##### -->
     <!-- jQuery-2.2.4 js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="{% static 'js/jquery/jquery-2.2.4.min.js' %}"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!-- Popper js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="{% static 'js/bootstrap/popper.min.js' %}"></script>
     <!-- Bootstrap js -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="{% static 'js/bootstrap/bootstrap.min.js' %}"></script>
     <!-- All Plugins js -->
     <script src="{% static 'js/plugins/plugins.js' %}"></script>

@@ -8,4 +8,6 @@ from . import views
 # All url routes for views
 urlpatterns = [
     path("dashboard", views.dashboard, name="dashboard"),
+    path("search_ingredients", views.search_ingredients, name="search_ingredients"),
+    path("pantry", views.pantry, name="pantry"),
 ]
