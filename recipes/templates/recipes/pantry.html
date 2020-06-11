@@ -491,7 +491,7 @@ MyPantry
                                         <div class="form-label-group">
                                             <textarea id="inputuw{{ item.id }}" class="form-control" rows="3" placeholder="Enter 'Use Within' information e.g. '3 days'" required oninput="checkuw('{{ item.id }}');"></textarea>
                                         </div>
-                                        <button type="submit" class="btn delicious-btn btn-block">Update Use Within Information</button>
+                                        <button type="submit" class="btn delicious-btn btn-block">Update</button>
                                     </form> 
                                 </div>
                             </div>
@@ -501,7 +501,7 @@ MyPantry
             </div>
         </div>
         <div class="modal-footer">
-            <form id="deleteform{{ item.id }}" onsubmit="deleteitem('{{ item.id }}'); return false;">
+            <form id="deleteform{{ item.id }}" onsubmit="deleteitem('{{ item.id }}'); return false;" class="mr-auto">
                 {% csrf_token %}   
                    <button type="submit" class="btn btn-4 delicious-btn">
                        <i class="fas fa-trash-alt"></i>  

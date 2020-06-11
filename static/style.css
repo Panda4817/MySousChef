@@ -2075,7 +2075,9 @@ textarea:focus {
 }
 
 .tooltip-inner {
-  background-color: #40ba37 !important;
+  background-color: #f3f5f8 !important;
+  color: #474747 !important;
+  border: 3px solid #40ba37 !important;
 }
 
 .tooltip.bs-tooltip-right .arrow:before {

@@ -2024,9 +2024,10 @@ color: #777;
     }
 }
 
-
  .tooltip-inner {
-    background-color: $bg-default !important;
+    background-color: $bg-gray !important;
+    color: $text-color2 !important;
+    border: 3px solid $bg-default !important;
 }
 .tooltip.bs-tooltip-right .arrow:before {
     border-right-color: $bg-default !important;
