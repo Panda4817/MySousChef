@@ -458,7 +458,7 @@ textarea:focus {
         }
     }
     &.btn-4 {
-        background-color: transparent;
+        background-color: white;
         border: 3px solid $bg-default;
         line-height: 53px;
         color: $bg-default;
@@ -1228,7 +1228,7 @@ textarea:focus {
             box-shadow: none !important;
             background-color: $bg-gray !important;
         }
-        span {
+        .input-group-text {
             background-color: $bg-gray;
             font-size: 14px;
             padding: 0 20px;
@@ -1650,16 +1650,19 @@ textarea:focus {
             text-transform: capitalize;
             font-weight: 600;
             span {
-                font-size: 10px;
-                position: absolute;
-                right: 20px;
-                text-align: center;
-                top: 23px;
-                &.accor-open {
-                    opacity: 0;
-                    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-                    filter: alpha(opacity=0);
+                &.accor {
+                   font-size: 10px;
+                    position: absolute;
+                    right: 20px;
+                    text-align: center;
+                    top: 23px;
+                    &.accor-open {
+                        opacity: 0;
+                        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+                        filter: alpha(opacity=0);
+                    } 
                 }
+                
             }
             &.collapsed {
                 background-color: $bg-gray;
@@ -1884,19 +1887,19 @@ color: #777;
     }
     #middle1 {
         @media #{$breakpoint-lg} {
-            margin-left: 1px;
-            }
-            @media #{$breakpoint-xl} {
-                margin-left: 1px;
-            }
+            margin-left: 5px;
+        }
+        @media #{$breakpoint-xl} {
+            margin-left: 5px;
+        }
     }
     #top1, #bottom1 {
         @media #{$breakpoint-lg} {
-            margin-left: 1px;
+            margin-left: 5px;
             border-right: 0 !important; 
         }
         @media #{$breakpoint-xl} {
-            margin-left: 1px;
+            margin-left: 5px;
             border-right: 0 !important; 
         }
         @media #{$breakpoint-xs} {
@@ -1926,10 +1929,13 @@ color: #777;
         }
     }
     .col-lg {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-end;
-        flex: content;
+        &.pantry {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            flex: content; 
+        }
+       
     }
 }
 
@@ -1996,6 +2002,48 @@ color: #777;
     color: $white-color;
 }
 
+.modal-header {
+    background-color: $bg-default !important;
+    .modal-title {
+      color: white !important; 
+    }
+    .btn {
+        color: white;
+        font-size: x-large;
+        font-weight: bolder;
+        &:hover {
+            background-color: white;
+            color: $bg-default;
+        }
+    }
+}
+
+.modal-body {
+    .countdown {
+        color: $bg-default !important;
+    }
+}
+
+
+ .tooltip-inner {
+    background-color: $bg-default !important;
+}
+.tooltip.bs-tooltip-right .arrow:before {
+    border-right-color: $bg-default !important;
+}
+.tooltip.bs-tooltip-left .arrow:before {
+    border-left-color: $bg-default !important;
+}
+.tooltip.bs-tooltip-bottom .arrow:before {
+    border-bottom-color: $bg-default !important;
+}
+.tooltip.bs-tooltip-top .arrow:before {
+    border-top-color: $bg-default !important;
+}
+
+.tooltip.show {
+    opacity: 1 !important;
+} 
        
         
         

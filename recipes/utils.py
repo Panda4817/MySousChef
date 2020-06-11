@@ -113,7 +113,7 @@ def addToPantry(ingredientName, user, intolerance):
             for u in userpantry:
                 if u.pantry_item.api_id == p.api_id:
                     user_has = True
-                    message = "Already in Pantry"
+                    message = "Already in Pantry. You can change the quantity instead"
                     return message
             if user_has == False:
                 relate = UserToPantry(user=user, pantry_item=p)

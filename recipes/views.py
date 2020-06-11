@@ -7,6 +7,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .utils import RecipeClient, check_intolerance, addToPantry
 from .models import *
+from datetime import datetime
+from django.conf import settings
+from dateutil import parser
+import pytz
 
 # Configure clients
 api_client = RecipeClient()
@@ -37,13 +41,23 @@ def search_ingredients(request):
             ingredient_list.append(result['name'])
             if searchInput == result['name']:
                 input_correct = True
-            
-        response = {
-            'json_list': ingredient_list,
-            'input_correct': input_correct
-        }
         
-        return JsonResponse(response) 
+        if len(ingredient_list) > 0:
+            data = {
+                'json_list': ingredient_list,
+                'input_correct': input_correct
+            }    
+            response = JsonResponse(data)
+            response.status_code = 200
+        else:
+            data = {
+                'message': 'Pantry item not found',
+                'fail': True,
+            }
+            response = JsonResponse(data)
+            response.status_code = 404
+
+        return response 
     return redirect('recipes:pantry')
 
 @login_required(login_url=reverse_lazy("accounts:login"))
@@ -74,3 +88,165 @@ def pantry(request):
     }
 
     return render(request, 'recipes/pantry.html', context)
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def change_qty(request):
+    if request.method == 'POST':
+        usertopantry_id = request.POST['usertopantry_id']
+        new_qty =  request.POST['new_qty']
+
+        if int(new_qty) < 1:
+            data = {
+                'id': usertopantry_id,
+                'message': "Number must ne 1 or more",
+                'fail': True
+            }
+            response = JsonResponse(data)
+            response.status_code = 400
+            return response
+
+        item = UserToPantry.objects.get(pk=usertopantry_id)
+        item.quantity = new_qty
+        item.save()
+
+        response = {
+            'id': usertopantry_id,
+            'new_qty': new_qty
+        }
+        return JsonResponse(response)
+    return redirect('recipes:pantry')
+
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def change_useby(request):
+    if request.method == 'POST':
+        usertopantry_id = request.POST['usertopantry_id']
+        usetext =  request.POST['datetext']
+        usedate = request.POST['new_date']
+
+        
+        date = (parser.isoparse(usedate))
+        today = timezone.now()
+        if date < today:
+            data = {
+                'id': usertopantry_id,
+                'message': "Date cannot be in the past",
+                'fail': True
+            }
+            response = JsonResponse(data)
+            response.status_code = 400
+            return response
+
+        print(date)
+        
+        item = UserToPantry.objects.get(pk=usertopantry_id)
+        item.usebefore_text = usetext
+        item.usebefore = date
+        item.save()
+
+        data = {
+            'id': usertopantry_id,
+            'datetext': usetext,
+            'date': usedate,
+        }
+        response = JsonResponse(data)
+        response.status_code = 200
+        return response
+    return redirect('recipes:pantry')
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def change_open(request):
+    if request.method == 'POST':
+        usertopantry_id = request.POST['usertopantry_id']
+        opendate = request.POST['new_date']
+
+        
+        date = (parser.isoparse(opendate))
+        today = timezone.now()
+        if date < today:
+            data = {
+                'id': usertopantry_id,
+                'message': "Date cannot be in the past",
+                'fail': True
+            }
+            response = JsonResponse(data)
+            response.status_code = 400
+            return response
+        print(date)
+        
+        item = UserToPantry.objects.get(pk=usertopantry_id)
+        item.opened = date
+        item.save()
+
+        data = {
+            'id': usertopantry_id,
+            'date': opendate,
+        }
+        response = JsonResponse(data)
+        response.status_code = 200
+        return response
+    return redirect('recipes:pantry')
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def change_frozen(request):
+    if request.method == 'POST':
+        usertopantry_id = request.POST['usertopantry_id']
+        frozendate = request.POST['new_date']
+
+        
+        date = (parser.isoparse(frozendate))
+        today = timezone.now()
+        if date < today:
+            data = {
+                'id': usertopantry_id,
+                'message': "Date cannot be in the past",
+                'fail': True
+            }
+            response = JsonResponse(data)
+            response.status_code = 400
+            return response
+        print(date)
+        
+        item = UserToPantry.objects.get(pk=usertopantry_id)
+        item.frozen = date
+        item.save()
+
+        data = {
+            'id': usertopantry_id,
+            'date': frozendate,
+        }
+        response = JsonResponse(data)
+        response.status_code = 200
+        return response
+    return redirect('recipes:pantry')
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def change_use_within(request):
+    if request.method == 'POST':
+        usertopantry_id = request.POST['usertopantry_id']
+        uw = request.POST['uw']
+
+        item = UserToPantry.objects.get(pk=usertopantry_id)
+        item.use_within = uw
+        item.save()
+
+        response = {
+            'id': usertopantry_id,
+            'uw': item.use_within,
+        }
+        return JsonResponse(response) 
+    return redirect('recipes:pantry')
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def delete_pantry_item(request):
+    if request.method == 'POST':
+        usertopantry_id = request.POST['usertopantry_id']
+
+        item = UserToPantry.objects.get(pk=usertopantry_id)
+        item.delete()
+
+        response = {
+            'id': usertopantry_id,
+        }
+        return JsonResponse(response) 
+    return redirect('recipes:pantry')

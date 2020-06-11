@@ -444,7 +444,7 @@ textarea:focus {
   border-color: #1c8314;
 }
 .delicious-btn.btn-4 {
-  background-color: transparent;
+  background-color: white;
   border: 3px solid #40ba37;
   line-height: 53px;
   color: #40ba37;
@@ -1238,7 +1238,7 @@ textarea:focus {
   box-shadow: none !important;
   background-color: #f3f5f8 !important;
 }
-.receipe-post-search form span {
+.receipe-post-search form .input-group-text {
   background-color: #f3f5f8;
   font-size: 14px;
   padding: 0 20px;
@@ -1682,14 +1682,14 @@ textarea:focus {
   text-transform: capitalize;
   font-weight: 600;
 }
-.single-accordion h6 a span {
+.single-accordion h6 a span.accor {
   font-size: 10px;
   position: absolute;
   right: 20px;
   text-align: center;
   top: 23px;
 }
-.single-accordion h6 a span.accor-open {
+.single-accordion h6 a span.accor.accor-open {
   opacity: 0;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
@@ -1917,23 +1917,23 @@ textarea:focus {
 }
 @media only screen and (min-width:992px) and (max-width:1199px) {
   #virtualPantry #middle1 {
-    margin-left: 1px;
+    margin-left: 5px;
   }
 }
 @media only screen and (min-width:1200px) {
   #virtualPantry #middle1 {
-    margin-left: 1px;
+    margin-left: 5px;
   }
 }
 @media only screen and (min-width:992px) and (max-width:1199px) {
   #virtualPantry #top1, #virtualPantry #bottom1 {
-    margin-left: 1px;
+    margin-left: 5px;
     border-right: 0 !important;
   }
 }
 @media only screen and (min-width:1200px) {
   #virtualPantry #top1, #virtualPantry #bottom1 {
-    margin-left: 1px;
+    margin-left: 5px;
     border-right: 0 !important;
   }
 }
@@ -1972,7 +1972,7 @@ textarea:focus {
     margin-top: 10px;
   }
 }
-#virtualPantry .col-lg {
+#virtualPantry .col-lg.pantry {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -2052,6 +2052,50 @@ textarea:focus {
 .bottom3 {
   background-color: #01545a;
   color: #ffffff;
+}
+
+.modal-header {
+  background-color: #40ba37 !important;
+}
+.modal-header .modal-title {
+  color: white !important;
+}
+.modal-header .btn {
+  color: white;
+  font-size: x-large;
+  font-weight: bolder;
+}
+.modal-header .btn:hover {
+  background-color: white;
+  color: #40ba37;
+}
+
+.modal-body .countdown {
+  color: #40ba37 !important;
+}
+
+.tooltip-inner {
+  background-color: #40ba37 !important;
+}
+
+.tooltip.bs-tooltip-right .arrow:before {
+  border-right-color: #40ba37 !important;
+}
+
+.tooltip.bs-tooltip-left .arrow:before {
+  border-left-color: #40ba37 !important;
+}
+
+.tooltip.bs-tooltip-bottom .arrow:before {
+  border-bottom-color: #40ba37 !important;
+}
+
+.tooltip.bs-tooltip-top .arrow:before {
+  border-top-color: #40ba37 !important;
+}
+
+.tooltip.show {
+  opacity: 1 !important;
 }
 
 /*# sourceMappingURL=style.css.map */

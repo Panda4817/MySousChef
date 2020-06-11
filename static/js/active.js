@@ -142,4 +142,7 @@
         snapTolerance: 40
     });
 
+   
+    $('[data-toggle="tooltip"]').tooltip();
+
 })(jQuery);
