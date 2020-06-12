@@ -52,7 +52,6 @@ def search_ingredients(request):
         else:
             data = {
                 'message': 'Pantry item not found',
-                'fail': True,
             }
             response = JsonResponse(data)
             response.status_code = 404
@@ -64,7 +63,7 @@ def search_ingredients(request):
 def pantry(request):
     user = User.objects.get(pk=request.user.id) 
     if request.method == 'POST':
-        ingredientName = request.POST['search']
+        ingredientName = request.POST['ingredientName']
         print(ingredientName)
         intolerance = request.POST.getlist('intolerance[]')
         print(intolerance)
@@ -74,12 +73,32 @@ def pantry(request):
         if boolintolerance == False:
             intolerance = None
         
-        message = addToPantry(ingredientName, user, intolerance)
-
-        if 'ERROR' in message:
-            messages.error(request, message)
+        data = addToPantry(ingredientName, user, intolerance)
+        if 'ERROR' in data['message']:
+            response_data = {
+                'message': data['message']
+            }
+            response = JsonResponse(response_data)
+            response.status_code = 404
+            return response
         else:
-            messages.success(request, message)      
+            added = (data['item'].added).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            new_aisle = data['item'].pantry_item.aisle
+            if ';' in data['item'].pantry_item.aisle:
+                aisle = data['item'].pantry_item.aisle
+                new_aisle = aisle.replace(';', ', ')
+            response_data = {
+                'message': data['message'],
+                'id': data['item'].id,
+                'name': data['item'].pantry_item.name,
+                'aisle': new_aisle,
+                'image': data['item'].pantry_item.image,
+                'added': added,
+                'quantity': data['item'].quantity,
+            } 
+            response = JsonResponse(response_data)
+            response.status_code = 200
+            return response   
         return redirect('recipes:pantry')
     
     items = list(UserToPantry.objects.filter(user=user))
@@ -99,7 +118,6 @@ def change_qty(request):
             data = {
                 'id': usertopantry_id,
                 'message': "Number must ne 1 or more",
-                'fail': True
             }
             response = JsonResponse(data)
             response.status_code = 400
@@ -126,18 +144,22 @@ def change_useby(request):
 
         
         date = (parser.isoparse(usedate))
+        print(date)
+        inputdate = datetime.date(date)
+        print(inputdate)
         today = timezone.now()
-        if date < today:
+        todaydate = datetime.date(today)
+        print(todaydate)
+        if inputdate < todaydate:
             data = {
                 'id': usertopantry_id,
                 'message': "Date cannot be in the past",
-                'fail': True
             }
             response = JsonResponse(data)
             response.status_code = 400
             return response
 
-        print(date)
+        
         
         item = UserToPantry.objects.get(pk=usertopantry_id)
         item.usebefore_text = usetext
@@ -162,12 +184,16 @@ def change_open(request):
 
         
         date = (parser.isoparse(opendate))
+        print(date)
+        inputdate = datetime.date(date)
+        print(inputdate)
         today = timezone.now()
-        if date < today:
+        todaydate = datetime.date(today)
+        print(todaydate)
+        if inputdate < todaydate:
             data = {
                 'id': usertopantry_id,
                 'message': "Date cannot be in the past",
-                'fail': True
             }
             response = JsonResponse(data)
             response.status_code = 400
@@ -195,12 +221,16 @@ def change_frozen(request):
 
         
         date = (parser.isoparse(frozendate))
+        print(date)
+        inputdate = datetime.date(date)
+        print(inputdate)
         today = timezone.now()
-        if date < today:
+        todaydate = datetime.date(today)
+        print(todaydate)
+        if inputdate < todaydate:
             data = {
                 'id': usertopantry_id,
                 'message': "Date cannot be in the past",
-                'fail': True
             }
             response = JsonResponse(data)
             response.status_code = 400

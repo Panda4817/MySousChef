@@ -1,3 +1,16 @@
+document.querySelector('#pantryadd').setAttribute("disabled", "disabled");
+var timeout = null;
+
+// General function to titleCase string
+function titleCase(str) {
+    str = str.toLowerCase().split(' ');
+    for (var i = 0; i < str.length; i++) {
+        str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
+    }
+    return str.join(' ');
+}
+
+
 function convertLocalDate() {
     var dates = document.getElementsByClassName('date');
     var i;
@@ -7,8 +20,8 @@ function convertLocalDate() {
         if (timestamp != 'No use-by or best-before date provided' 
             && timestamp != 'Not opened/ Not something that can be opened' 
             && timestamp != 'Not frozen/ Cannot be frozen'
-            && timestamp != 'Today'
-            && timestamp != 'Yesterday') {
+            && timestamp.includes('Today') == false
+            && timestamp.includes('Yesterday') == false) {
             var local = new Date(timestamp);
             var now = new Date();
             if (local.toDateString() == now.toDateString())
@@ -21,7 +34,8 @@ function convertLocalDate() {
         }
             
         
-    } 
+    }
+    return; 
 }
 
 // General function convert timestamps into local time and date
@@ -31,85 +45,253 @@ function convertLocalTime() {
     var len = time.length;
     for (i = 0; i < len; i++) {
         var timestamp = time[i].textContent;
-        var local = new Date(timestamp);
-        var now = new Date();
-        if (local.toDateString() == now.toDateString())
-            var date = 'Today';
-        else if (local.getDate() == (now.getDate() - 1))
-            var date = 'Yesterday';
-        else
-            var date = local.toDateString();
-        time[i].innerText = date + ' ' + local.toLocaleTimeString();
+        if (timestamp.includes('Today') == false
+            && timestamp.includes('Yesterday') == false) {
+                var local = new Date(timestamp);
+                var now = new Date();
+                if (local.toDateString() == now.toDateString())
+                    var date = 'Today';
+                else if (local.getDate() == (now.getDate() - 1))
+                    var date = 'Yesterday';
+                else
+                    var date = local.toDateString();
+                time[i].innerText = date + ' ' + local.toLocaleTimeString(); 
+            }
+        
     };
+    return;
+}
+
+function searchingredients() {
+    document.querySelector('#pantryadd').setAttribute("disabled", "disabled");
+    document.querySelector('#searchinput').classList.add('is-invalid');
+    clearTimeout(timeout);
+    if (document.querySelector('#searchinput').value.length >= 3) {
+        timeout = setTimeout(() => {   
+            $.ajax({
+                type: "POST",
+                url: "/search_ingredients",
+                data: {
+                    search_input: $('#searchinput').val(),
+                    intolerance: $('#intolerance').val(),
+                },
+                headers: {
+                    'X-CSRFToken': document.getElementById('addpantryform').firstElementChild.value
+                },
+            })
+            .done(function(data) {
+                $('#searchinput').autocomplete({source: data.json_list});
+                let ui = document.querySelectorAll('.ui-menu');
+                for (var i=0; i<ui.length; i++) {
+                    ui[i].addEventListener('click', () => {
+                      document.querySelector('#pantryadd').removeAttribute('disabled');
+                        document.querySelector('#searchinput').classList.remove('is-invalid');
+                        document.querySelector('#searchinput').classList.add('is-valid');
+                        document.getElementById('searcherror').style.display = "none";
+                        document.getElementById('addpantrye').style.display = "none";
+                        document.getElementById('addpantrys').style.display = "none";  
+                    })
+                }
+                if (data.input_correct == true) {
+                    document.querySelector('#pantryadd').removeAttribute('disabled');
+                    document.querySelector('#searchinput').classList.remove('is-invalid');
+                    document.querySelector('#searchinput').classList.add('is-valid');
+                    document.getElementById('searcherror').style.display = "none";
+                    document.getElementById('addpantrye').style.display = "none";
+                    document.getElementById('addpantrys').style.display = "none";
+                    return;
+                }
+                else {
+                    document.querySelector('#pantryadd').setAttribute("disabled", "disabled");
+                    document.querySelector('#searchinput').classList.remove('is-valid');
+                    document.querySelector('#searchinput').classList.add('is-invalid');
+                    document.getElementById('addpantrye').style.display = "none";
+                    document.getElementById('addpantrys').style.display = "none";
+                    return;
+                } 
+            })
+            .fail(function(data) {
+                document.querySelector('#pantryadd').setAttribute("disabled", "disabled");
+                document.querySelector('#searchinput').classList.remove('is-valid');
+                document.querySelector('#searchinput').classList.add('is-invalid');
+                document.getElementById('searcherror').style.display = "block";
+                document.getElementById('addpantrye').style.display = "none";
+                document.getElementById('addpantrys').style.display = "none";
+                return;
+            })
+        }, 500);
+    }
+    
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    let searchInput = document.querySelector('#searchinput');
-    let addBtn = document.querySelector('#pantryadd');
-    addBtn.disabled = true;
-    let timeout = null;
-    searchInput.addEventListener('input', () => {
-        addBtn.disabled = true;
-        clearTimeout(timeout);
-            if (searchInput.value.length >= 3) {
-            timeout = setTimeout(() => {   
-                $.ajax({
-                    type: "POST",
-                    url: "/search_ingredients",
-                    data: {
-                        search_input: $('#searchinput').val(),
-                        intolerance: $('#intolerance').val(),
-                    },
-                    headers: {
-                        'X-CSRFToken': document.getElementById('addpantryform').firstElementChild.value
-                    },
-                })
-                .done(function(data) {
-                    $('#searchinput').autocomplete({source: data.json_list});
-                    document.querySelector('.ui-menu').addEventListener('click', () => {
-                        addBtn.disabled = false;
-                        searchInput.classList.remove('is-invalid');
-                        searchInput.classList.add('is-valid');
-                        document.getElementById('searcherror').style.display = "none";
-                    })
-                    if (data.input_correct == true) {
-                        addBtn.disabled = false;
-                        searchInput.classList.remove('is-invalid');
-                        searchInput.classList.add('is-valid');
-                        document.getElementById('searcherror').style.display = "none";
-                    }
-                    else {
-                        addBtn.disabled = true;
-                        searchInput.classList.remove('is-valid');
-                        searchInput.classList.add('is-invalid');
-                    } 
-                })
-                .fail(function(data) {
-                    addBtn.disabled = true;
-                    searchInput.classList.remove('is-valid');
-                    searchInput.classList.add('is-invalid');
-                    document.getElementById('searcherror').style.display = "block";
-                    console.log(data.message);
-                })
-            }, 500);
-        }
-        
-    });
-
-    
     convertLocalTime();
-
     let dateInputs = document.getElementsByClassName('inputdate');
     for(var i=0; i<dateInputs.length; i++) {
         dateInputs[i].min = new Date().toISOString().split("T")[0];
     }
-    
-    
     convertLocalDate();
-    
-   
-
 });
+
+function  updatedompantry(data) {
+    const template = Handlebars.compile(document.querySelector('#modal_template').innerHTML);
+    let div  = document.createElement('div');
+    div.id = "item"+data.id;
+    div.className = "pantry draggable ui-widget-content";
+    div.setAttribute('onclick', "addMonthDay('"+data.id+"');");
+    div.setAttribute('data-toggle', 'modal');
+    div.setAttribute('data-target', '#modal'+data.id)
+    div.innerHTML = titleCase(data.name);
+
+    var added = false;
+    if (data.aisle == "Refrigerated" ||
+        data.aisle == "Nut butters, Jams, and Honey" ||
+        data.aisle == "Milk, Eggs, Other Dairy" ||
+        data.aisle == "Cheese") {
+            div.classList.add('other');
+            document.getElementById('other').appendChild(div);
+            added = true;
+        }
+    if (data.aisle == "Meat" ||
+        data.aisle == "Seafood") {
+            div.classList.add('meat');
+            document.getElementById('meat').appendChild(div);
+            added = true;
+    }
+    if (data.aisle == "Produce") {
+        div.classList.add('produce');
+        document.getElementById('produce').appendChild(div);
+        added = true;
+    }
+
+    if (data.aisle == "Frozen") {
+        div.classList.add('frozen');
+        document.getElementById('frozen').appendChild(div);
+        added = true;
+    }
+    if (data.aisle == "Canned and Jarred") {
+            div.classList.add('top1');
+            document.getElementById('top1').appendChild(div);
+            added = true;
+    }
+    if (data.aisle == "Oil, Vinegar, Salad Dressing" ||
+        data.aisle == "Condiments" ||
+        data.aisle == "Sweet Snacks" ||
+        data.aisle == "Savory Snacks" ||
+        data.aisle == "Nuts" ||
+        data.aisle == "Dried Fruits") {
+            div.classList.add('top2');
+            document.getElementById('top2').appendChild(div);
+            added = true;
+    }
+    if (data.aisle == "Pasta and Rice" ||
+        data.aisle == "Baking") {
+            div.classList.add('top3');
+            document.getElementById('top3').appendChild(div);
+            added = true;
+    }
+    if (data.aisle == "Spices and Seasonings") {
+        div.classList.add('middle1');
+        document.getElementById('middle1').appendChild(div);
+        added = true;
+    }
+    if (data.aisle == "Bread" ||
+    data.aisle == "Bakery" ||
+    data.aisle == "Cereal" ||
+    data.aisle == "Tea and Coffee") {
+        div.classList.add('middle2');
+        document.getElementById('middle2').appendChild(div);
+        added = true;
+    }
+    if (data.aisle == "Alcoholic Beverages" ||
+    data.aisle == "Beverages") {
+        div.classList.add('middle3');
+        document.getElementById('middle3').appendChild(div);
+        added = true;
+    }
+    if (data.aisle == "Gourmet" ||
+    data.aisle == "Ethnic Foods" ||
+    data.aisle == "Not in Grocery Store" ||
+    data.aisle == "Homemade") {
+        div.classList.add('bottom1');
+        document.getElementById('bottom1').appendChild(div);
+        added = true;
+    }
+    if (data.aisle == "Gluten Free" ||
+    data.aisle == "Health Foods") {
+        div.classList.add('bottom2');
+        document.getElementById('bottom2').appendChild(div);
+        added = true;
+    }
+    if (added == false) {
+        div.classList.add('bottom3');
+        document.getElementById('bottom3').appendChild(div);
+    }
+
+    const content = template({
+        'id': data.id,
+        'name': titleCase(data.name),
+        'aisle': titleCase(data.aisle),
+        'added': data.added,
+        'quantity': data.quantity,
+        'image': data.image,
+    });
+    document.querySelector('body').innerHTML += content;
+    convertLocalTime();
+    let dateInputs = document.getElementsByClassName('inputdate');
+    for(var i=0; i<dateInputs.length; i++) {
+        dateInputs[i].min = new Date().toISOString().split("T")[0];
+    }
+    $(".draggable").draggable({
+        snap: true, 
+        snap: ".pantry",
+        snapTolerance: 40
+    });
+    $('[data-toggle="tooltip"]').tooltip();
+    return;
+}
+
+function addtopantry() {
+    document.getElementById('searcherror').style.display = "none";
+    let a = document.querySelector('select[name="intolerance"]').selectedOptions;
+    let b = [];
+    for(var i=0; i<a.length; i++) {
+        b.push(a[i].value);
+    }
+    let c = document.querySelector('#searchinput').value;
+    $.ajax({
+        type: "POST",
+        url: '/pantry',
+        data: {
+            'intolerance': b,
+            'ingredientName': c,
+        },
+        headers: {
+            'X-CSRFToken':  document.getElementById('addpantryform').firstElementChild.value
+        },
+    })
+    .done(function (data) {
+        document.querySelector('#pantryadd').setAttribute("disabled", "disabled");
+        document.querySelector('#searchinput').classList.add('is-valid');
+        document.querySelector('#searchinput').classList.remove('is-invalid');
+        document.getElementById('addpantrye').style.display = "none";
+        document.getElementById('addpantrys').innerHTML = data.message;
+        document.getElementById('addpantrys').style.display = "block";
+        document.querySelector('#searchinput').classList.remove('is-valid');
+        updatedompantry(data);
+        return;
+    })
+    .fail(function (data) {
+        document.querySelector('#pantryadd').setAttribute("disabled", "disabled");
+        document.querySelector('#searchinput').classList.add('is-invalid');
+        document.querySelector('#searchinput').classList.remove('is-valid');
+        document.getElementById('addpantrys').style.display = "none";
+        document.getElementById('addpantrye').innerHTML = data.responseJSON.message;
+        document.getElementById('addpantrye').style.display = "block";
+        return;
+    })
+}
 
 function checkqty(data) {
     'use strict';
@@ -171,9 +353,9 @@ function changeqty(data) {
         document.getElementById('qtyerror'+data.id).style.display = "none";
     })
     .fail(function (data) {
-        document.getElementById('inputqty'+data.id).classList.remove('is-valid');
-        document.getElementById('inputqty'+data.id).classList.add('is-invalid');
-        document.getElementById('qtyerror'+data.id).style.display = "block";
+        document.getElementById('inputqty'+data.responseJSON.id).classList.remove('is-valid');
+        document.getElementById('inputqty'+data.responseJSON.id).classList.add('is-invalid');
+        document.getElementById('qtyerror'+data.responseJSON.id).style.display = "block";
     })
 }
 
@@ -195,7 +377,7 @@ function diffDate(startDate, endDate) {
   function display(obj) {
     var str = '';
     for (key in obj) {
-        if (obj[key] != 0)
+        if (obj[key] > 0)
             str = str + obj[key] + ' ' + key + ' ';
     }
     if (str == '')
@@ -218,14 +400,14 @@ function addMonthDay(data) {
     let opendate = document.getElementById('openref'+data);
     if (opendate != null) {
         let localopendate = new Date(opendate.value);
-        let out2  = diffDate(today, localopendate);
+        let out2  = diffDate(localopendate, today);
         let countdownstr2 = display(out2);
         document.getElementById('opencountdown'+data).innerHTML = countdownstr2;
     }
     let frozendate = document.getElementById('frozenref'+data);
     if (frozendate != null) {
         let localfrozendate = new Date(frozendate.value);
-        let out3  = diffDate(today, localfrozendate);
+        let out3  = diffDate(localfrozendate, today);
         let countdownstr3 = display(out3);
         document.getElementById('frozencountdown'+data).innerHTML = countdownstr3;
     }
@@ -301,9 +483,9 @@ function changeuseby(data) {
         document.getElementById('useerror'+data.id).style.display = "none";
     })
     .fail(function (data) {
-        document.getElementById('inputuse'+data.id).classList.remove('is-valid');
-        document.getElementById('inputuse'+data.id).classList.add('is-invalid');
-        document.getElementById('useerror'+data.id).style.display = "block";
+        document.getElementById('inputuse'+data.responseJSON.id).classList.remove('is-valid');
+        document.getElementById('inputuse'+data.responseJSON.id).classList.add('is-invalid');
+        document.getElementById('useerror'+data.responseJSON.id).style.display = "block";
     })
 }
 
@@ -333,9 +515,9 @@ function changeopen(data) {
         document.getElementById('openerror'+data.id).style.display = "none";
     })
     .fail(function (data) {
-        document.getElementById('inputopen'+data.id).classList.remove('is-valid');
-        document.getElementById('inputopen'+data.id).classList.add('is-invalid');
-        document.getElementById('openerror'+data.id).style.display = "block";
+        document.getElementById('inputopen'+data.responseJSON.id).classList.remove('is-valid');
+        document.getElementById('inputopen'+data.responseJSON.id).classList.add('is-invalid');
+        document.getElementById('openerror'+data.responseJSON.id).style.display = "block";
     })
 }
 
@@ -365,9 +547,9 @@ function changefrozen(data) {
         document.getElementById('frozenerror'+data.id).style.display = "none";
     })
     .fail(function (data) {
-        document.getElementById('inputfrozen'+data.id).classList.remove('is-valid');
-        document.getElementById('inputfrozen'+data.id).classList.add('is-invalid');
-        document.getElementById('frozenerror'+data.id).style.display = "block";
+        document.getElementById('inputfrozen'+data.responseJSON.id).classList.remove('is-valid');
+        document.getElementById('inputfrozen'+data.responseJSON.id).classList.add('is-invalid');
+        document.getElementById('frozenerror'+data.responseJSON.id).style.display = "block";
     })
 }
 

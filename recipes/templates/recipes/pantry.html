@@ -26,7 +26,7 @@ MyPantry
     <!-- Pantry Items Search and add -->
     <div class="receipe-post-search mb-5">
         <div class="container">
-            <form method="post" id="addpantryform">
+            <form method="post" id="addpantryform" onsubmit="addtopantry(); return false;">
                 {% csrf_token %}
                 <div class="form-row">
                     <div class="col-lg col-12">
@@ -52,15 +52,19 @@ MyPantry
                             <div class="input-group-prepend"><div class="input-group-text">
                                 <i class="fas fa-search"></i>
                             </div></div>
-                                <input type="search" id="searchinput" class="form-control" name="search" placeholder="Search Ingredients">
+                                <input type="search" id="searchinput" oninput="searchingredients();" class="form-control ui-autocomplete-input" name="search" placeholder="Search Ingredients"  autocomplete="off">
                                 <div id="searcherror" class="invalid-feedback" style="display: none;">
                                     Pantry item not found
+                                </div>
+                                <div id="addpantrye" class="invalid-feedback" style="display: none;">
+                                </div>
+                                <div id="addpantrys" class="valid-feedback" style="display: none;">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg col-12">
-                        <button type="submit" id="pantryadd" formaction="{% url 'recipes:pantry' %}" class="btn delicious-btn btn-block" disabled>Add to Pantry</button>
+                        <button type="submit" id="pantryadd" class="btn delicious-btn btn-block" disabled>Add to Pantry</button>
                     </div>
                 </div>
             </form>
@@ -514,5 +518,185 @@ MyPantry
   </div>
 {% endfor %}
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+{% verbatim %}
+<script id="modal_template" type="text/template">
+<div class="modal fade " id="modal{{ id }}">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">{{ name }}</h4>
+          <button type="button" class="btn" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <img class="img-fluid mx-auto d-block" src="https://spoonacular.com/cdn/ingredients_100x100/{{ image }}" alt="pic of item">
+                    </div>
+                    <div class="col-lg-8" id="topsection{{ id }}">
+                        <div class="row">
+                            <div class="col-lg">
+                                <h6>Type: {{ aisle }}</h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg">
+                                <h6>Added: <span class="time">{{ added }}</span></h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg">
+                        <div class="accordions mb-80" id="accordion{{ id }}" role="tablist" aria-multiselectable="true">
+                            
+                            <!-- Single Accordian Area -->
+                            <div class="panel single-accordion">
+                                <h6><a role="button" class="collapsed" aria-expanded="true" aria-controls="collapseOne" data-toggle="collapse" data-parent="#accordion{{ id }}" href="#collapseOne{{ id }}">
+                                    Quantity: <span id="qty{{ id }}">{{ quantity }}</span>
+                                        <span class="accor-open accor"><i class="fas fa-edit"></i>&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></span>
+                                        <span class="accor-close accor"><i class="fas fa-edit"></i>&nbsp;<i class="fa fa-minus" aria-hidden="true"></i></span>
+                                        </a></h6>
+                                <div id="collapseOne{{ id }}" class="accordion-content collapse">
+                                    <form method='POST' class="form-signin" id="qtyform{{ id }}" onsubmit="changeqty('{{ id }}'); return false;">
+                                        {% endverbatim %}   {% csrf_token %} {% verbatim %}
+                                        <div class="form-label-group">
+                                            <input type="number" id="inputqty{{ id }}" class="form-control" placeholder="Enter Quantity" required autofocus min="1" oninput="checkqty('{{ id }}')">
+                                            <label for="inputqty{{ id }}">Enter Quantity</label>
+                                            <div id="qtyerror{{ id }}" class="invalid-feedback" style="display: none;">
+                                                Please provide a valid number, must be 1 or more.
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn delicious-btn btn-block">Update Quantity</button>
+                                    </form>
+                                </div>
+                            </div>
+            
+                            <!-- Single Accordian Area -->
+                            <div class="panel single-accordion">
+                                <h6>
+                                    <a role="button" class="collapsed" aria-expanded="true" aria-controls="collapseTwo" data-parent="#accordion{{ id }}" data-toggle="collapse" href="#collapseTwo{{ id }}">
+                                        <span id="usetext{{ id }}">Use By/Best Before</span>:  <span id="usedate{{ id }}" class="date">No use-by or best-before date provided</span>
+                                        <span class="accor-open accor"><i class="fas fa-edit"></i>&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></span>
+                                        <span class="accor-close accor"><i class="fas fa-edit"></i>&nbsp;<i class="fa fa-minus" aria-hidden="true"></i></span>
+                                            </a>
+                                </h6>
+                                <div id="collapseTwo{{ id }}" class="accordion-content collapse">
+                                    <form method='POST' class="form-signin" id="useform{{ id }}" onsubmit="changeuseby('{{ id }}'); return false;">
+                                        {% endverbatim %} {% csrf_token %} {% verbatim %}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="radiotext{{ id }}" id="use{{ id }}" value="Use By" checked>
+                                            <label for="use{{ id }}" class="form-check-label">Use By</label>
+                                            
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="radiotext{{ id }}" id="best{{ id }}" value="Best Before">
+                                            <label for="best{{ id }}" class="form-check-label">Best Before</label>
+                                            
+                                        </div>
+                                        
+                                        <div class="form-label-group">
+                                            <input oninput="checkdate('{{ id }}', 'use')" type="date" id="inputuse{{ id }}" class="form-control inputdate" placeholder="Enter Date" required data-toggle="tooltip" data-placement="bottom" title="If quantity is more than 1, choose the date that is the closest to today">
+                                            <label for="inputuse{{ id }}">Enter Date</label>
+                                            <div id="useerror{{ id }}" class="invalid-feedback" style="display: none;">
+                                                Please provide a valid date, must NOT be in the past.
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn delicious-btn btn-block">Update Date</button>
+                                    </form>
+                                </div>
+                            </div>
+            
+                            <!-- Single Accordian Area -->
+                            <div class="panel single-accordion">
+                                <h6>
+                                    <a role="button" aria-expanded="true" aria-controls="collapseThree" class="collapsed" data-parent="#accordion{{ id }}" data-toggle="collapse" href="#collapseThree{{ id }}">
+                                        Opened: <span id="opendate{{ id }}" class="date">Not opened/ Not something that can be opened</span>
+                                        <span class="accor-open accor"><i class="fas fa-edit"></i>&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></span>
+                                        <span class="accor-close accor"><i class="fas fa-edit"></i>&nbsp;<i class="fa fa-minus" aria-hidden="true"></i></span>
+                                        </a>
+                                </h6>
+                                <div id="collapseThree{{ id }}" class="accordion-content collapse">
+                                    <form method='POST' class="form-signin" id="openform{{ id }}" onsubmit="changeopen('{{ id }}'); return false;">
+                                        {% endverbatim %} {% csrf_token %} {% verbatim %}
+                                        <div class="form-label-group">
+                                            <input oninput="checkdate('{{ id }}', 'open')" type="date" id="inputopen{{ id }}" class="form-control inputdate" placeholder="Enter Date" required data-toggle="tooltip" data-placement="bottom" title="If quantity is more than 1, choose the date that is the closest to today">
+                                            <label for="inputopen{{ id }}">Enter Date</label>
+                                            <div id="openerror{{ id }}" class="invalid-feedback" style="display: none;">
+                                                Please provide a valid date, must NOT be in the past.
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn delicious-btn btn-block">Update Date</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Single Accordian Area -->
+                            <div class="panel single-accordion">
+                                <h6>
+                                    <a role="button" aria-expanded="true" aria-controls="collapseFour" class="collapsed" data-parent="#accordion{{ id }}" data-toggle="collapse" href="#collapseFour{{ id }}">
+                                        Frozen: <span id="frozendate{{ id }}" class="date">Not frozen/ Cannot be frozen</span>
+                                        <span class="accor-open accor"><i class="fas fa-edit"></i>&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></span>
+                                        <span class="accor-close accor"><i class="fas fa-edit"></i>&nbsp;<i class="fa fa-minus" aria-hidden="true"></i></span>
+                                        </a>
+                                </h6>
+                                <div id="collapseFour{{ id }}" class="accordion-content collapse">
+                                    <form method='POST' class="form-signin" id="frozenform{{ id }}" onsubmit="changefrozen('{{ id }}'); return false;">
+                                        {% endverbatim %}{% csrf_token %} {% verbatim %}
+                                        <div class="form-label-group">
+                                            <input oninput="checkdate('{{ id }}', 'frozen')" type="date" id="inputfrozen{{ id }}" class="form-control inputdate" placeholder="Enter Date" required data-toggle="tooltip" data-placement="bottom" title="If quantity is more than 1, choose the date that is the closest to today">
+                                            <label for="inputfrozen{{ id }}">Enter Date</label>
+                                            <div id="frozenerror{{ id }}" class="invalid-feedback" style="display: none;">
+                                                Please provide a valid date, must NOT be in the past.
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn delicious-btn btn-block">Update Date</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Single Accordian Area -->
+                            <div class="panel single-accordion">
+                                <h6>
+                                    <a role="button" aria-expanded="true" aria-controls="collapseFive" class="collapsed" data-parent="#accordion{{ id }}" data-toggle="collapse" href="#collapseFive{{ id }}">
+                                        Use within: <span id="uw{{ id }}">No 'use within' information provided</span>
+                                        <span class="accor-open accor"><i class="fas fa-edit"></i>&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></span>
+                                        <span class="accor-close accor"><i class="fas fa-edit"></i>&nbsp;<i class="fa fa-minus" aria-hidden="true"></i></span>
+                                        </a>
+                                </h6>
+                                <div id="collapseFive{{ id }}" class="accordion-content collapse">
+                                    <form method='POST' class="form-signin" id="uwform{{ id }}" onsubmit="changeuw('{{ id }}'); return false;">
+                                        {% endverbatim %} {% csrf_token %} {% verbatim %}
+                                        <div class="form-label-group">
+                                            <textarea id="inputuw{{ id }}" class="form-control" rows="3" placeholder="Enter 'Use Within' information e.g. '3 days'" required oninput="checkuw('{{ id }}');"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn delicious-btn btn-block">Update</button>
+                                    </form> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <form id="deleteform{{ id }}" onsubmit="deleteitem('{{ id }}'); return false;" class="mr-auto">
+              {% endverbatim %}     {% csrf_token %} {% verbatim %}
+                   <button type="submit" class="btn btn-4 delicious-btn">
+                       <i class="fas fa-trash-alt"></i>  
+                   </button>    
+               </form>
+      </div>
+
+      </div>
+    </div>
+  </div> 
+</script>
+{% endverbatim %}
 <script src="{% static 'js/pantry.js' %}"></script>
 {% endblock %}

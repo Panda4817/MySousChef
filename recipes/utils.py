@@ -107,19 +107,27 @@ def addToPantry(ingredientName, user, intolerance):
     already_in = False
     user_has = False
     message = ""
+    data = {}
     for p in pantry:
         if ingredientName == p.name:
             already_in = True
             for u in userpantry:
                 if u.pantry_item.api_id == p.api_id:
                     user_has = True
-                    message = "Already in Pantry. You can change the quantity instead"
-                    return message
+                    message = "ERROR: Already in Pantry. You can change the quantity instead"
+                    data.update({
+                        'message': message,
+                    })
+                    return data
             if user_has == False:
                 relate = UserToPantry(user=user, pantry_item=p)
                 relate.save()
                 message = "Added to Pantry"
-                return message
+                data.update({
+                    'message': message,
+                    'item': relate,
+                })
+                return data
     
     if already_in == False:
         api_client = RecipeClient()
@@ -132,6 +140,13 @@ def addToPantry(ingredientName, user, intolerance):
                 relate = UserToPantry(user=user, pantry_item=item)
                 relate.save()
                 message = "Added to Pantry"
-                return message
+                data.update({
+                    'message': message,
+                    'item': relate,
+                })
+                return data
     message = "ERROR: Pantry item could not be found"
-    return message
+    data.update({
+        'message': message,
+    })
+    return data
