@@ -36,3 +36,30 @@ class UserToPantry(models.Model):
                 quantity__gt=0), name='quantity_gt_0')
         ]
 
+class Recipes(models.Model):
+    api_id = models.PositiveIntegerField()
+    title = models.CharField(max_length=200)
+    image = models.URLField()
+    serves = models.PositiveIntegerField()
+    time = models.PositiveIntegerField()
+    source_url = models.URLField()
+    credit = models.CharField(max_length=200, null=True)
+    health_score = models.DecimalField(max_digits=4, decimal_places=2)
+    popularity = models.PositiveIntegerField()
+    wine_pairing = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.api_id} - {self.title}"
+
+class RecipeIngredients(models.Model):
+    recipe_id = models.ForeignKey(Recipes, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    amount = models.DecimalField(max_digits=7, decimal_places=3)
+    unit = models.CharField(max_length=64)
+    meta = models.CharField(max_length=200, blank=True)
+
+class RecipeInstructions(models.Model):
+    recipe_id = models.ForeignKey(Recipes, on_delete=models.CASCADE)
+    step = models.PositiveIntegerField()
+    description = models.TextField()
+

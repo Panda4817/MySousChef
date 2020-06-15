@@ -10,7 +10,6 @@ function titleCase(str) {
     return str.join(' ');
 }
 
-
 function convertLocalDate() {
     var dates = document.getElementsByClassName('date');
     var i;
@@ -120,6 +119,10 @@ function searchingredients() {
                 return;
             })
         }, 500);
+    } else {
+        document.getElementById('searcherror').style.display = "none";
+        document.getElementById('addpantrye').style.display = "none";
+        document.getElementById('addpantrys').style.display = "none";
     }
     
 
@@ -237,7 +240,7 @@ function  updatedompantry(data) {
         'quantity': data.quantity,
         'image': data.image,
     });
-    document.querySelector('body').innerHTML += content;
+    document.querySelector('#modals').innerHTML += content;
     convertLocalTime();
     let dateInputs = document.getElementsByClassName('inputdate');
     for(var i=0; i<dateInputs.length; i++) {
@@ -278,7 +281,7 @@ function addtopantry() {
         document.getElementById('addpantrye').style.display = "none";
         document.getElementById('addpantrys').innerHTML = data.message;
         document.getElementById('addpantrys').style.display = "block";
-        document.querySelector('#searchinput').classList.remove('is-valid');
+        document.querySelector('#searchinput').value = "";
         updatedompantry(data);
         return;
     })

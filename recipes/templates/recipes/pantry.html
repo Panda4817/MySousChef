@@ -56,9 +56,9 @@ MyPantry
                                 <div id="searcherror" class="invalid-feedback" style="display: none;">
                                     Pantry item not found
                                 </div>
-                                <div id="addpantrye" class="invalid-feedback" style="display: none;">
+                                <div id="addpantrye" class="invalid-tooltip" style="display: none;">
                                 </div>
-                                <div id="addpantrys" class="valid-feedback" style="display: none;">
+                                <div id="addpantrys" class="valid-tooltip" style="display: none;">
                                 </div>
                             </div>
                         </div>
@@ -306,7 +306,7 @@ MyPantry
 
 </div>
 
-
+<div id="modals">
 {% for item in items %}
 <div class="modal fade " id="modal{{ item.id }}">
     <div class="modal-dialog modal-lg">
@@ -517,6 +517,7 @@ MyPantry
     </div>
   </div>
 {% endfor %}
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
 {% verbatim %}

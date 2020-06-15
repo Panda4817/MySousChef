@@ -1,16 +1,17 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, Http404
 from django.urls import reverse_lazy
 from django.contrib.auth.signals import user_logged_out, user_logged_in
 from .signals import show_login_message, show_logout_message
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .utils import RecipeClient, check_intolerance, addToPantry
+from .utils import RecipeClient, check_list, addToPantry, prepare_simple_results, prepare_advance_results
 from .models import *
 from datetime import datetime
 from django.conf import settings
 from dateutil import parser
 import pytz
+import json
 
 # Configure clients
 api_client = RecipeClient()
@@ -28,7 +29,7 @@ def search_ingredients(request):
         intolerance = request.POST.getlist('intolerance[]')
         print(intolerance)
         # Check what the intolerance selection is
-        boolintolerance = check_intolerance(intolerance)
+        boolintolerance = check_list(intolerance)
         if boolintolerance == False:
             intolerance = None
         
@@ -69,7 +70,7 @@ def pantry(request):
         print(intolerance)
         
         # Check what the intolerance selection is
-        boolintolerance = check_intolerance(intolerance)
+        boolintolerance = check_list(intolerance)
         if boolintolerance == False:
             intolerance = None
         
@@ -280,3 +281,133 @@ def delete_pantry_item(request):
         }
         return JsonResponse(response) 
     return redirect('recipes:pantry')
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def search_recipes(request):
+    return render(request, 'recipes/search.html')
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def search_simple(request):
+    if request.method =='POST':
+        user = request.user.id
+        pantry_items = list(UserToPantry.objects.filter(user=user))
+        if len(pantry_items) == 0:
+            data = {
+                'message': "No items in MyPantry to search with. Add ingredients to MyPantry."
+            }
+            response = JsonResponse(data)
+            response.status_code = 400
+            return response
+
+        names = [] 
+        for i in pantry_items:
+            names.append(i.pantry_item.name)
+        
+        results = api_client.search_recipes_ingredients(names)
+        
+        if len(results) == 0:
+            data = {
+                'message': "No results. Add more items to MyPantry."
+            }
+            response = JsonResponse(data)
+            response.status_code = 400
+            return response
+        
+        response = prepare_simple_results(results)
+        return response
+    return redirect('recipes:search_recipes')
+
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def search_advanced(request):
+    if request.method =='POST':
+        user = request.user.id
+        query = request.POST['query']
+        if not query:
+            data = {
+                'message': "Must enter query word/phrase for advanced search"
+            }
+            response = JsonResponse(data)
+            response.status_code = 400
+            return response
+        
+        ingredients = request.POST['ingredients']
+        names = []
+        if ingredients == 'yes':
+            pantry_items = list(UserToPantry.objects.filter(user=user))
+            if len(pantry_items) == 0:
+                data = {
+                    'message': "No items in MyPantry to search with. Add ingredients to MyPantry."
+                }
+                response = JsonResponse(data)
+                response.status_code = 400
+                return response 
+            for i in pantry_items:
+                names.append(i.pantry_item.name)
+        else:
+            names = None
+        
+        intolerance = request.POST.getlist('intolerance[]')
+        boolintolerance = check_list(intolerance)
+        if boolintolerance == False:
+            intolerance = None
+        
+        diet = request.POST['diet']
+        if not diet or diet == '0':
+            diet = None
+        meal_type = request.POST['meal_type']
+        if not meal_type or meal_type == '0':
+            meal_type = None
+        
+        cuisine = request.POST.getlist('cuisine[]')
+        boolcuisine = check_list(cuisine)
+        if boolcuisine == False:
+            cuisine = None
+        
+        sort = request.POST['sort']
+        sort_direction = ''
+        if sort == 'No Sort':
+            sort = None
+            sort_direction = None
+        elif sort == 'time':
+            sort_direction = 'asc'
+        else:
+            sort_direction = 'desc'
+        
+        results = api_client.search_recipes_complex(query, cuisine, diet, intolerance, names, meal_type, sort, sort_direction)
+        response = prepare_advance_results(results)
+        return response
+    return redirect('recipes:search_recipes')
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def recipe(request, recipe_id):
+    try:
+        recipe = Recipes.objects.get(api_id=recipe_id)
+    except Recipes.DoesNotExist:
+        messages.error(request, "Recipe does not exist")
+        return redirect('recipes:search_recipes')
+    ingredients = list(RecipeIngredients.objects.filter(recipe_id=recipe))
+    steps = list(RecipeInstructions.objects.filter(recipe_id=recipe).order_by('step'))
+    if steps == []:
+        results = api_client.get_recipe_instructions(recipe_id)
+        if results == []:
+            messages.error(request, "Cannot retrieve instructions. Go to the source website.")
+            return redirect('recipes:search_recipes')
+        for i in results[0]['steps']:
+            instruction = RecipeInstructions(
+                recipe_id=recipe,
+                step=i['number'],
+                description=i['step'],
+            )
+            instruction.save()
+    steps = list(RecipeInstructions.objects.filter(recipe_id=recipe).order_by('step'))
+    context = {
+        'recipe': recipe,
+        'ingredients': ingredients,
+        'steps': steps
+    }
+    return render(request, 'recipes/recipe.html', context)
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def shopping_list(request):
+    return render(request, 'recipes/shopping_list.html')

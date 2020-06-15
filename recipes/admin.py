@@ -22,10 +22,20 @@ class UserToPantryAdmin(admin.ModelAdmin):
 
 
 
-
 class PantryAdmin(admin.ModelAdmin):
     model = Pantry
     list_display = ['pk', 'name', 'api_id', 'aisle', 'image']
 
+class RecipesAdmin(admin.ModelAdmin):
+    model = Recipes
+    list_display = ['pk', 'api_id', 'title', 'image', 'serves', 'time', 'source_url', 'credit', 'health_score', 'popularity', 'wine_pairing']
+
+class RecipeIngredientsAdmin(admin.ModelAdmin):
+    model = RecipeIngredients
+    list_display = ['pk', 'recipe_id', 'name', 'amount', 'unit', 'meta']
+
+
 admin.site.register(Pantry, PantryAdmin)
 admin.site.register(UserToPantry, UserToPantryAdmin)
+admin.site.register(Recipes, RecipesAdmin)
+admin.site.register(RecipeIngredients, RecipeIngredientsAdmin)

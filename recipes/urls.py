@@ -16,4 +16,9 @@ urlpatterns = [
     path("change-frozen-pantry", views.change_frozen, name="change-frozen-pantry"),
     path("change-uw-pantry", views.change_use_within, name="change-uw-pantry"),
     path("delete-pantry-item", views.delete_pantry_item, name="delete-pantry-item"),
+    path("search-recipes", views.search_recipes, name="search_recipes"),
+    path("search-simple", views.search_simple, name="search_simple"),
+    path("search-advanced", views.search_advanced, name="search_advanced"),
+    path("recipe/<int:recipe_id>", views.recipe, name="recipe"),
+    path("shopping-list", views.shopping_list, name="shopping_list"),
 ]

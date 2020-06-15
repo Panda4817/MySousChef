@@ -1,0 +1,85 @@
+{% extends 'recipes/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load filters %}
+{% block title %}
+Recipe
+{% endblock %}
+
+{% block body %}
+<!-- ##### Breadcumb Area Start ##### -->
+<div class="breadcumb-area bg-img bg-overlay" style="background-image: url({{ recipe.image }});">
+    <div class="container h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-12">
+                <div class="breadcumb-text text-center">
+                    <h2>{{ recipe.title }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ##### Breadcumb Area End ##### -->
+
+<!-- Receipe Content Area -->
+<div class="receipe-content-area">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-12 col-md-8">
+                <div class="receipe-headline my-5">
+                    <span><a href="{{ recipe.source_url }}">{% if recipe.credit %}{{ recipe.credit }}{% else %}click here for source{% endif %}</a></span>
+                    <h2>{{ recipe.title }}</h2>
+                    <div class="receipe-duration">
+                        <h6>Ready in: {{ recipe.time }}  minutes</h6>
+                        <h6>Servings: {{ recipe.serves }}</h6>
+                        <h6>Health score of {{ recipe.health_score|floatformat }}</h6>
+                        <h6>Popularity: {{ recipe.popularity }} like(s)</h6>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <img class="img-fluid mx-auto d-block" src="{{ recipe.image }}" alt="recipe picture">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <!-- Single Preparation Step -->
+                {% for step in steps %}
+                <div class="single-preparation-step d-flex">
+                    <h4>{{ step.step }}</h4>
+                    <p>{{ step.description }}</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Ingredients -->
+            <div class="col-12 col-lg-4">
+                <div class="ingredients">
+                    <h4>Ingredients</h4>
+                    <ul>
+                        {% for ingredient in ingredients %}
+                        <li class="mb-1">{{ ingredient.amount|floatformat }} 
+                            {% if ingredient.unit %}{{ ingredient.unit|lower }} of {% endif %}
+                            {{ ingredient.name }}
+                            {% if ingredient.meta %} -  {{ ingredient.meta }}{% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul> 
+                </div>
+            </div>
+        </div>
+        {% if recipe.wine_pairing != null and recipe.wine_pairing != 'None' %}
+        <div class="row">
+            <div class="col-12">
+                <h4>Wine Pairing</h4>
+                <p>{{ recipe.wine_pairing }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

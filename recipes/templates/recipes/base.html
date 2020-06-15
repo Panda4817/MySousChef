@@ -26,22 +26,7 @@
         <img src="{% static 'img/core-img/salad.png' %}" alt="loader">
     </div>
 
-    <!-- Search Wrapper -->
-    <div class="search-wrapper">
-        <!-- Close Btn -->
-        <div class="close-btn"><i class="fa fa-times" aria-hidden="true"></i></div>
-
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <form action="#" method="post">
-                        <input type="search" name="search" placeholder="Type any keywords...">
-                        <button type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+   
 
     <header class="header-area">
         <!-- Top Header Area -->
@@ -92,9 +77,9 @@
                             <ul>
                                 <li><a href="{% url 'recipes:dashboard' %}">Home</a></li>
                                 <li><a href="{% url 'recipes:pantry' %}">MyPantry</a></li>
-                                <li><a href="#">Search Recipes</a></li>
-                                <li><a href="#">MyMealPlanner</a></li>
-                                <li><a href="#">MyShoppingList</a></li>
+                                <li><a href="{% url 'recipes:shopping_list' %}">MyShoppingList</a></li>
+                                <li><a href="{% url 'recipes:search_recipes' %}">Search Recipes</a></li>
+                                <li><a href="#">MyRecipes</a></li>
                                 <li><a href="{% url 'accounts:contact' %}">Contact</a></li>
                                 <li><a href="{% url 'accounts:account' %}"><i class="fas fa-user"></i> {{ user.username }}</a>
                                     <ul class="dropdown">
@@ -105,10 +90,6 @@
                                         
                             </ul>
                             
-                            <!-- Newsletter Form -->
-                            <div class="search-btn">
-                                <i class="fa fa-search" aria-hidden="true"></i>
-                            </div>
 
                         </div>
                         <!-- Nav End -->

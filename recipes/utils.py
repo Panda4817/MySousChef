@@ -5,6 +5,7 @@ import requests
 from urllib.parse import quote, urlencode
 from django.db import models
 from django.contrib.auth.models import User
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from .models import *
 
 api_key = os.getenv('API_KEY')
@@ -20,6 +21,7 @@ class RecipeClient(object):
         filters.update({'apiKey': self.key})
         filter_str = urlencode(filters)
         try:
+            print('https://{}{}?{}'.format(self.host, path, filter_str))
             response = self.session.get('https://{}{}?{}'.format(self.host, path, filter_str))
             response.raise_for_status()
         except requests.RequestException:
@@ -32,13 +34,21 @@ class RecipeClient(object):
 
 
     def search_recipes_ingredients(self, ingredients):
-        filters = {'ingredients': ',+'.join(ingredients), 'ignorePantry': 'false'}
+        filters = {'ingredients': ','.join(ingredients), 'number': 2, 'limitLicense': False, 'ranking': 2, 'ignorePantry': False}
         response = self._get('/recipes/findByIngredients', filters)
         return response
     
     def get_recipe_info(self, recipe_id):
-        filters = {'includeNutrition': 'true'}
+        filters = {'includeNutrition': 'false'}
         response = self._get('/recipes/{}/information'.format(recipe_id), filters)
+        return response
+    
+    def get_recipe_bulk(self, recipe_id_list):
+        filters = {
+            'ids': ','.join(recipe_id_list),
+            'includeNutrition': 'false',
+        }
+        response = self._get('/recipes/informationBulk', filters)
         return response
     
     def get_recipes_similar(self, recipe_id):
@@ -46,24 +56,46 @@ class RecipeClient(object):
         response = self._get('/recipes/{}/similar'.format(recipe_id), filters)
         return response
     
-    def search_recipes_complex(self, query, cuisine, diet, intolerances, includeIngredients, meal_type):
-        filters_list = [cuisine, diet, intolerances, meal_type]
+    def search_recipes_complex(self, query, cuisine, diet, intolerances, includeIngredients, meal_type, sort, sortDirection):
         filters = {}
-        for filter in filters_list:
-            if filter is not None:
-                if filters_list.index(filter) == 0:
-                    filters.update({'cuisine': cuisine})
-                if filters_list.index(filter) == 1:
-                    filters.update({'diet': diet})
-                if filters_list.index(filter) == 2:
-                    filters.update({'intolerances': ',+'.join(intolerances)})
-                if filters_list.index(filter) == 3:
-                    filters.update({'type': meal_type})
         filters.update({
             'query': query,
-            'includeIngredients': ',+'.join(includeIngredients), 
-            'ignorePantry': 'false',
-            'fillIngredients': 'true',
+        })
+        if cuisine is not None:
+            filters.update({'cuisine': ','.join(cuisine)})
+        if diet is not None:
+            filters.update({'diet': diet})
+        if intolerances is not None:
+            filters.update({'intolerances': ','.join(intolerances)})
+        if includeIngredients is not None:
+            filters.update({'includeIngredients': ','.join(includeIngredients)})
+        if meal_type is not None:
+            filters.update({'type': meal_type})
+        
+        if includeIngredients is not None:
+            filters.update({
+                'instructionsRequired': False,
+                'fillIngredients': True,
+                'addRecipeInformation': True,
+                'addRecipeNutrition': False,
+                'ignorePantry': False,
+            })
+        else:
+            filters.update({
+                'instructionsRequired': False,
+                'fillIngredients': True,
+                'addRecipeInformation': True,
+                'addRecipeNutrition': False,
+                'ignorePantry': True,
+            })
+        if sort is not None:
+            filters.update({
+                'sort': sort,
+                'sortDirection': sortDirection,
+            })
+        filters.update({
+            'number': 2,
+            'limitLicense': False
         })
         response = self._get('/recipes/complexSearch', filters)
         return response
@@ -81,7 +113,7 @@ class RecipeClient(object):
     def get_ingredients(self, query, intolerances):
         filters = {'query': query, 'metaInformation': 'true'}
         if intolerances is not None:
-            filters.update({'intolerances': ',+'.join(intolerances)})
+            filters.update({'intolerances': ','.join(intolerances)})
         response = self._get('/food/ingredients/autocomplete', filters)
         return response
     
@@ -89,17 +121,22 @@ class RecipeClient(object):
         filters = {'ingredientName': ingredientName}
         response = self._get('/food/ingredients/substitutes', filters)
         return response
+    
+    def get_recipe_instructions(self, recipe_id):
+        filters = {'stepBreakdown': True}
+        response = self._get('/recipes/{}/analyzedInstructions'.format(recipe_id), filters)
+        return response
 
 
-def check_intolerance(intolerance):
-    check_intolerance = True
-    if len(intolerance) != 0:
-        for i in intolerance:
+def check_list(list_name):
+    check_list = True
+    if len(list_name) != 0:
+        for i in list_name:
             if i == "0":
-                check_intolerance = False
+                check_list = False
     else:
-        check_intolerance = False
-    return check_intolerance
+        check_list = False
+    return check_list
 
 def addToPantry(ingredientName, user, intolerance):
     pantry = list(Pantry.objects.all())
@@ -150,3 +187,269 @@ def addToPantry(ingredientName, user, intolerance):
         'message': message,
     })
     return data
+
+def prepare_simple_results(results):
+    recipes = []
+    found = []
+    not_found = []
+    check_found = False
+    database = list(Recipes.objects.all())
+    
+    for i in results:
+        if i["missedIngredientCount"] == 0:
+            recipes.append(i['id'])
+    
+    if len(recipes) == 0:
+        for i in results:
+            for j in database:
+                if i['id'] == j.api_id:
+                    found.append({
+                        'id': j.api_id,
+                        'image': j.image,
+                        'title': j.title,
+                        'serves': j.serves,
+                        'time': j.time,
+                        'health': j.health_score,
+                        'url': j.source_url,
+                        'credit': j.credit,
+                        'likes': j.popularity
+                    })
+                    check_found = True
+            if check_found == False:
+                not_found.append(str(i['id']))
+            check_found = False
+        if len(not_found) > 0:
+            api_client = RecipeClient()
+            results2 = api_client.get_recipe_bulk(not_found)
+            for i in results2:
+                if i['winePairing']:
+                    item = Recipes(
+                        api_id=i['id'],
+                        title=i['title'],
+                        image=i['image'],
+                        serves=i['servings'],
+                        time=i['readyInMinutes'],
+                        source_url=i['sourceUrl'],
+                        credit=i['creditsText'],
+                        health_score=i['healthScore'],
+                        popularity=i['aggregateLikes'],
+                        wine_pairing=i['winePairing']['pairingText']
+                    )
+                else:
+                    item = Recipes(
+                        api_id=i['id'],
+                        title=i['title'],
+                        image=i['image'],
+                        serves=i['servings'],
+                        time=i['readyInMinutes'],
+                        source_url=i['sourceUrl'],
+                        credit=i['creditsText'],
+                        health_score=i['healthScore'],
+                        popularity=i['aggregateLikes'],
+                        wine_pairing="None"
+                    )
+                item.save()
+                found.append({
+                    'id': item.api_id,
+                    'image': item.image,
+                    'title': item.title,
+                    'serves': item.serves,
+                    'time': item.time,
+                    'health': item.health_score,
+                    'url': item.source_url,
+                    'credit': item.credit,
+                    'likes': item.popularity
+                })
+                for j in i['extendedIngredients']:
+                    amount = j['measures']['metric']['amount']
+                    unit = j['measures']['metric']['unitShort']
+                    name = j['name']
+                    if j['meta']:
+                        meta = ', '.join(j['meta'])
+                    else:
+                        meta = ''
+                    ing = RecipeIngredients(
+                        recipe_id=item,
+                        name=name,
+                        amount=amount,
+                        unit=unit,
+                        meta=meta
+                    )
+                    ing.save()
+        data = {
+            'message': "No results with just MyPantry items. Add more items to MyPantry. Below are results in order of lowest to highest missing ingredients.",
+            'recipes': found,
+        }
+        response = JsonResponse(data)
+        response.status_code = 200
+        return response
+    
+    for i in recipes:
+        for j in database:
+            if i == j.api_id:
+                found.append({
+                        'id': j.api_id,
+                        'image': j.image,
+                        'title': j.title,
+                        'serves': j.serves,
+                        'time': j.time,
+                        'health': j.health_score,
+                        'url': j.source_url,
+                        'credit': j.credit,
+                        'likes': j.popularity
+                    })
+                check_found = True
+        if check_found == False:
+            not_found.append(i)
+        check_found = False
+    if len(not_found) > 0:
+        results2 = api_client.get_recipe_bulk(not_found)
+        for i in results2:
+            if i['winePairing']:
+                item = Recipes(
+                    api_id=i['id'],
+                    title=i['title'],
+                    image=i['image'],
+                    serves=i['servings'],
+                    time=i['readyInMinutes'],
+                    source_url=i['sourceUrl'],
+                    credit=i['creditsText'],
+                    health_score=i['healthScore'],
+                    popularity=i['aggregateLikes'],
+                    wine_pairing=i['winePairing']['pairingText']
+                )
+            else:
+                item = Recipes(
+                    api_id=i['id'],
+                    title=i['title'],
+                    image=i['image'],
+                    serves=i['servings'],
+                    time=i['readyInMinutes'],
+                    source_url=i['sourceUrl'],
+                    credit=i['creditsText'],
+                    health_score=i['healthScore'],
+                    popularity=i['aggregateLikes'],
+                    wine_pairing="None"
+                )
+            item.save()
+            found.append({
+                    'id': item.api_id,
+                    'image': item.image,
+                    'title': item.title,
+                    'serves': item.serves,
+                    'time': item.time,
+                    'health': item.health_score,
+                    'url': item.source_url,
+                    'credit': item.credit,
+                    'likes': item.popularity
+                })
+            for j in i['extendedIngredients']:
+                amount = j['metirc']['amount']
+                unit = j['metric']['unitShort']
+                name = j['name']
+                if j['meta']:
+                    meta = ', '.join(j['meta'])
+                else:
+                    meta = ''
+                ing = RecipeIngredients(
+                    recipe_id=item,
+                    name=name,
+                    amount=amount,
+                    unit=unit,
+                    meta=meta
+                )
+                ing.save()
+        
+    data = {'recipes': found}
+    response = JsonResponse(data)
+    response.status_code = 200
+    return response
+
+def prepare_advance_results(results):
+    if len(results['results']) == 0:
+        data = {'message': "No results. Try just searching without MyPantry items instead"}
+        response = JsonResponse(data)
+        response.status_code = 400
+        return response
+    
+    recipes = []
+    found = []
+    check_found = False
+    database = list(Recipes.objects.all())
+    
+    for i in results['results']:
+        for j in database:
+            if j.api_id == i['id']:
+                found.append({
+                    'id': j.api_id,
+                    'image': j.image,
+                    'title': j.title,
+                    'serves': j.serves,
+                    'time': j.time,
+                    'health': j.health_score,
+                    'url': j.source_url,
+                    'credit': j.credit,
+                    'likes': j.popularity,
+                })
+                check_found = True
+        if check_found == False:
+            if i['winePairing']:
+                item = Recipes(
+                    api_id=i['id'],
+                    title=i['title'],
+                    image=i['image'],
+                    serves=i['servings'],
+                    time=i['readyInMinutes'],
+                    source_url=i['sourceUrl'],
+                    credit=i['creditsText'],
+                    health_score=i['healthScore'],
+                    popularity=i['aggregateLikes'],
+                    wine_pairing=i['winePairing']['pairingText']
+                )
+            else:
+                item = Recipes(
+                    api_id=i['id'],
+                    title=i['title'],
+                    image=i['image'],
+                    serves=i['servings'],
+                    time=i['readyInMinutes'],
+                    source_url=i['sourceUrl'],
+                    credit=i['creditsText'],
+                    health_score=i['healthScore'],
+                    popularity=i['aggregateLikes'],
+                    wine_pairing="None"
+                )
+            item.save()
+            found.append({
+                'id': item.api_id,
+                'image': item.image,
+                'title': item.title,
+                'serves': item.serves,
+                'time': item.time,
+                'health': item.health_score,
+                'url': item.source_url,
+                'credit': item.credit,
+                'likes': item.popularity
+            })
+            for j in i['extendedIngredients']:
+                amount = j['measures']['metric']['amount']
+                unit = j['measures']['metric']['unitShort']
+                name = j['name']
+                if j['meta']:
+                    meta = ', '.join(j['meta'])
+                else:
+                    meta = ''
+                ing = RecipeIngredients(
+                    recipe_id=item,
+                    name=name,
+                    amount=amount,
+                    unit=unit,
+                    meta=meta
+                )
+                ing.save()
+        check_found = False
+    data = {'recipes': found}
+    response = JsonResponse(data)
+    response.status_code = 200
+    return response
+        
