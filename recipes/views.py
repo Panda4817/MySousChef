@@ -410,4 +410,86 @@ def recipe(request, recipe_id):
 
 @login_required(login_url=reverse_lazy("accounts:login"))
 def shopping_list(request):
-    return render(request, 'recipes/shopping_list.html')
+    if request.method == 'POST':
+        pantry_id = request.POST['pantry_id']
+        pantryitem = UserToPantry.objects.get(pk=pantry_id)
+        items = list(ShoppingList.objects.filter(user=request.user.id))
+        for item in items:
+            if item.name == pantryitem.pantry_item.name.title():
+                data = {
+                'id': pantry_id,
+                'message': "Item already added to shopping list"
+                }
+                response = JsonResponse(data)
+                response.status_code = 400
+                return response
+        itemsave = ShoppingList(user=request.user, name=pantryitem.pantry_item.name.title())
+        itemsave.save()
+        data = {
+            'id': pantry_id
+        }
+        response = JsonResponse(data)
+        response.status_code = 200
+        return response
+
+
+    items = list(ShoppingList.objects.filter(user=request.user.id))
+    context = {}
+    if len(items) > 0:
+        context.update({'items': items})
+    return render(request, 'recipes/shopping_list.html', context)
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def add_list(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+        if not name:
+            data = {
+                'message': "Must enter name of item"
+            }
+            response = JsonResponse(data)
+            response.status_code = 400
+            return response
+        items = list(ShoppingList.objects.filter(user=request.user.id))
+        for item in items:
+            if name.title() == item.name:
+                data = {
+                'message': "Item already added to shopping list"
+                }
+                response = JsonResponse(data)
+                response.status_code = 400
+                return response
+        item = ShoppingList(user=request.user, name=name.title())
+        item.save()
+        data = {
+            'id': item.id,
+            'name': item.name
+        }
+        response = JsonResponse(data)
+        response.status_code = 200
+        return response
+    return redirect('recipes:shopping_list')
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def delete_list(request):
+    if request.method == 'POST':
+        names = request.POST.getlist('names[]')
+        if len(names) == 0:
+            data = {
+                'message': "Must check items in the list to remove them."
+            }
+            response = JsonResponse(data)
+            response.status_code = 400
+            return response
+        items = list(ShoppingList.objects.filter(user=request.user.id))
+        ids = []
+        for item in items:
+            if item.name in names:
+                ids.append(item.id)
+                itemtod = ShoppingList.objects.get(pk=item.id)
+                itemtod.delete()
+        response = JsonResponse({'ids': ids})
+        response.status_code = 200
+        return response
+    return redirect('recipes:shopping_list')
+

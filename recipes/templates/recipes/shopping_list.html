@@ -1,0 +1,102 @@
+{% extends 'recipes/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load filters %}
+{% block title %}
+MyShoppingList
+{% endblock %}
+
+{% block body %}
+<!-- ##### Breadcumb Area Start ##### -->
+<div class="breadcumb-area bg-img bg-overlay" style="background-image: url({% static 'img/bg-img/breadcumb5.jpg' %});">
+    <div class="container h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-12">
+                <div class="breadcumb-text text-center">
+                    <h2>MyShoppingList</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ##### Breadcumb Area End ##### -->
+
+<div class="receipe-post-area section-padding-80">
+    <p class="text-center mb-5 mx-5">Add items to shopping list via the form below or from MyPantry page.</p>
+    <!-- Add to list -->
+    <div class="receipe-post-search mb-5">
+        <div class="container">
+            <form method="post" id="addToListform" onsubmit="addToList(); return false;">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="col-lg col-12">
+                        <input type="text" id="listinput" oninput="checklistinput();" class="form-control" name="addToListname" placeholder="Enter item name">
+                        <div id="addsuccess" class="valid-tooltip" style="display: none;">
+                            Added to list
+                        </div>
+                        <div id="adderror" class="invalid-tooltip" style="display: none;">
+                        </div>
+                    </div>
+                    <div class="col-lg col-12">
+                        <button type="submit" id="listaddbtn" class="btn delicious-btn btn-block" disabled>Add to List</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+   
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <div class="card">
+                    <div class="ingredients card-body" id="list">
+                        {% if items == None %}
+                        <p id="none" class="card-text">No items</p>
+                        {% else %}
+                        {% for item in items %}
+                            <div class="custom-control custom-checkbox" id="listitem{{ item.id }}"> 
+                                <input type="checkbox" class="custom-control-input" name="listitem[]" id="check{{ item.id }}" onchange="check();" value="{{ item.name }}">
+                                <label class="custom-control-label card-text" for="check{{ item.id }}">{{ item.name|title }}</label>   
+                            </div>
+                        {% endfor %}
+                        {% endif %}
+
+                    </div>       
+                </div>
+                         
+            </div>
+            <div class="col-12 col-lg-4">
+                <form method="post" id="deleteListform" onsubmit="deleteList(); return false;">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="col-12"></div>
+                            <button type="submit" id="deletebtn" class="btn delicious-btn btn-block" disabled>Update list</button>
+                            <div id="deletesuccess" class="valid-tooltip" style="display: none;">
+                                List updated
+                            </div>
+                            <div id="deleteerror" class="invalid-tooltip" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+             
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+{% verbatim %}
+<script id="list_template" type="text/template">
+    <div class="custom-control custom-checkbox" id="listitem{{ id }}"> 
+        <input type="checkbox" class="custom-control-input" name="listitem[]" id="check{{ id }}"  onchange="check();" value="{{ name }}">
+        <label class="custom-control-label card-text" for="check{{ id }}">{{ name }}</label>   
+    </div>
+    
+</script>
+{% endverbatim %}
+<script src="{% static 'js/shopping.js' %}"></script>
+
+{% endblock %}

@@ -590,3 +590,31 @@ function deleteitem(data) {
     });
 }
 
+function shoppingitem(data) {
+    $.ajax({
+        type: "POST",
+        url: '/shopping-list',
+        data: {
+            'pantry_id': data
+        },
+        headers: {
+            'X-CSRFToken':  document.getElementById('shoppingform'+data).firstElementChild.value
+        },
+    })
+    .done(function (data) {
+        document.getElementById('addsuccess'+data.id).style.display = "block";
+        setTimeout(() => {
+        document.getElementById('addsuccess'+data.id).style.display = "none";  
+        }, 5000);
+        return;
+    })
+    .fail(function (data) {
+        document.getElementById('adderror'+data.responseJSON.id).innerHTML = data.responseJSON.message;
+        document.getElementById('adderror'+data.responseJSON.id).style.display = "block";
+        setTimeout(() => {
+           document.getElementById('adderror'+data.responseJSON.id).style.display = "none";  
+        }, 5000);
+        return;
+    })
+}
+

@@ -500,17 +500,32 @@ MyPantry
                                 </div>
                             </div>
                         </div>
+                        <div id="addsuccess{{ item.id }}" class="valid-tooltip" style="display: none;">
+                            Added to list
+                            </div>
+                            <div id="adderror{{ item.id }}" class="invalid-tooltip" style="display: none;">
+                            </div>
                     </div>
                 </div>
+                
             </div>
+            
         </div>
-        <div class="modal-footer">
-            <form id="deleteform{{ item.id }}" onsubmit="deleteitem('{{ item.id }}'); return false;" class="mr-auto">
+        <div class="modal-footer row">
+                <form id="deleteform{{ item.id }}" onsubmit="deleteitem('{{ item.id }}'); return false;" class="col-lg">
                 {% csrf_token %}   
                    <button type="submit" class="btn btn-4 delicious-btn">
                        <i class="fas fa-trash-alt"></i>  
                    </button>    
                </form>
+               <form id="shoppingform{{ item.id }}" onsubmit="shoppingitem('{{ item.id }}'); return false;" class="col-lg">
+                {% csrf_token %}    
+                   <button type="submit" class="btn btn-4 delicious-btn">
+                       Add to MyShoppingList
+                   </button>    
+               </form>
+            
+
       </div>
 
       </div>
@@ -681,16 +696,30 @@ MyPantry
                                 </div>
                             </div>
                         </div>
+                        <div id="addsuccess{{ id }}" class="valid-tooltip" style="display: none;">
+                            Added to list
+                            </div>
+                            <div id="adderror{{ id }}" class="invalid-tooltip" style="display: none;">
+                            </div> 
                     </div>
                 </div>
+                
             </div>
-        </div>
+              
+            </div>
         <div class="modal-footer">
             <form id="deleteform{{ id }}" onsubmit="deleteitem('{{ id }}'); return false;" class="mr-auto">
               {% endverbatim %}     {% csrf_token %} {% verbatim %}
                    <button type="submit" class="btn btn-4 delicious-btn">
                        <i class="fas fa-trash-alt"></i>  
                    </button>    
+               </form>
+               <form id="shoppingform{{ id }}" onsubmit="shoppingitem('{{ id }}'); return false;" class="mr-auto">
+                {% endverbatim %} {% csrf_token %} {% verbatim %} 
+                    <button type="submit" class="btn btn-4 delicious-btn">
+                       Add to MyShoppingList
+                   </button>
+                    
                </form>
       </div>
 

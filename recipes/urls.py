@@ -21,4 +21,6 @@ urlpatterns = [
     path("search-advanced", views.search_advanced, name="search_advanced"),
     path("recipe/<int:recipe_id>", views.recipe, name="recipe"),
     path("shopping-list", views.shopping_list, name="shopping_list"),
+    path("add-list", views.add_list, name="add_list"),
+    path("delete-list", views.delete_list, name="delete_list"),
 ]
