@@ -19,6 +19,7 @@ urlpatterns = [
     path("search-recipes", views.search_recipes, name="search_recipes"),
     path("search-simple", views.search_simple, name="search_simple"),
     path("search-advanced", views.search_advanced, name="search_advanced"),
+    path("recipe", views.myrecipe, name="myrecipe"),
     path("recipe/<int:recipe_id>", views.recipe, name="recipe"),
     path("shopping-list", views.shopping_list, name="shopping_list"),
     path("add-list", views.add_list, name="add_list"),

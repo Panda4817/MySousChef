@@ -1,0 +1,62 @@
+{% extends 'recipes/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load filters %}
+{% block title %}
+MyRecipes
+{% endblock %}
+
+{% block body %}
+<!-- ##### CTA Area Start ##### -->
+<section class="cta-area bg-img bg-overlay" style="background-image: url({% static 'img/bg-img/sr9.jpg' %});">
+    <div class="container h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-12">
+                <!-- Cta Content -->
+                <div class="cta-content text-center">
+                    <h2>MyRecipes</h2>
+                    <p>You can find all your liked recipes and add your own recipes here.</p>
+                    <a href="{% url 'recipes:search_recipes' %}" class="btn delicious-btn">Search Recipes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ##### CTA Area End ##### -->
+
+<section class="best-receipe-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section-heading">
+                    <h3>My Liked Recipes</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            {% if recipes == None %}
+            <p>No liked recipes</p>
+            {% else %}
+            {% for recipe in recipes %}
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="single-best-receipe-area mb-30">
+                    <img src="{{ recipe.image }}" alt="recipe picture">
+                    <div class="receipe-content">
+                        <a href="/recipe/{{ recipe.api_id }}">
+                            <h5>{{ recipe.title }}</h5>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+
+
+
+<script src="{% static 'js/recipe.js' %}"></script>
+{% endblock %}

@@ -381,6 +381,35 @@ def search_advanced(request):
 
 @login_required(login_url=reverse_lazy("accounts:login"))
 def recipe(request, recipe_id):
+    if request.method == 'POST':
+        api_id = request.POST['api_id']
+        try:
+            recipe = Recipes.objects.get(api_id=recipe_id)
+        except Recipes.DoesNotExist:
+            data = {
+                'message': "Error finding recipe, try later."
+            }
+            response = JsonResponse(data)
+            response.status_code = 400
+            return response
+        alreadyliked = list(UserToRecipe.objects.filter(user=request.user).filter(recipe_id=recipe))
+        if len(alreadyliked) > 0:
+            data = {
+                'message': "Already liked!"
+            }
+            response = JsonResponse(data)
+            response.status_code = 400
+            return response
+        
+        liked = UserToRecipe(user=request.user, recipe_id=recipe)
+        liked.save()
+        data = {
+            'message': "Added"
+        }
+        response = JsonResponse(data)
+        response.status_code = 200
+        return response
+
     try:
         recipe = Recipes.objects.get(api_id=recipe_id)
     except Recipes.DoesNotExist:
@@ -492,4 +521,8 @@ def delete_list(request):
         response.status_code = 200
         return response
     return redirect('recipes:shopping_list')
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def myrecipe(request):
+    return render(request, 'recipes/myrecipe.html')
 

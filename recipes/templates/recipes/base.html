@@ -79,7 +79,7 @@
                                 <li><a href="{% url 'recipes:pantry' %}">MyPantry</a></li>
                                 <li><a href="{% url 'recipes:shopping_list' %}">MyShoppingList</a></li>
                                 <li><a href="{% url 'recipes:search_recipes' %}">Search Recipes</a></li>
-                                <li><a href="#">MyRecipes</a></li>
+                                <li><a href="{%  url 'recipes:myrecipe' %}">MyRecipes</a></li>
                                 <li><a href="{% url 'accounts:contact' %}">Contact</a></li>
                                 <li><a href="{% url 'accounts:account' %}"><i class="fas fa-user"></i> {{ user.username }}</a>
                                     <ul class="dropdown">

@@ -63,8 +63,29 @@ class RecipeInstructions(models.Model):
     step = models.PositiveIntegerField()
     description = models.TextField()
 
+class UserToRecipe(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe_id = models.ForeignKey(Recipes, on_delete=models.CASCADE)
+
 class ShoppingList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
+class MyRecipe(models.Model):
+    title = models.CharField(max_length=200)
+    serves = models.PositiveIntegerField()
+    time = models.PositiveIntegerField()
+    wine_pairing = models.TextField(blank=True)
+
+class MyRecipeIngredients(models.Model):
+    recipe_id = models.ForeignKey(MyRecipe, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    amount = models.DecimalField(max_digits=7, decimal_places=3)
+    unit = models.CharField(max_length=64)
+    meta = models.CharField(max_length=200, blank=True)
+
+class MyRecipeInstructions(models.Model):
+    recipe_id = models.ForeignKey(MyRecipe, on_delete=models.CASCADE)
+    number = models.PositiveIntegerField()
+    step = models.TextField()
 
