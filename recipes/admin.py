@@ -42,6 +42,18 @@ class ShoppingListAdmin(admin.ModelAdmin):
     model = ShoppingList
     list_display = ['pk', 'name']
 
+class MyRecipeAdmin(admin.ModelAdmin):
+    model = MyRecipe
+    list_display = ['pk', 'title', 'image', 'serves', 'time', 'wine_pairing']
+
+class MyRecipeIngredientsAdmin(admin.ModelAdmin):
+    model = MyRecipeIngredients
+    list_display = ['pk', 'recipe_id', 'name', 'amount', 'unit', 'meta']
+
+class MyRecipeInstructionsAdmin(admin.ModelAdmin):
+    model = MyRecipeInstructions
+    list_display = ['pk', 'recipe_id', 'number', 'step']
+
 
 admin.site.register(Pantry, PantryAdmin)
 admin.site.register(UserToPantry, UserToPantryAdmin)
@@ -49,3 +61,6 @@ admin.site.register(Recipes, RecipesAdmin)
 admin.site.register(RecipeIngredients, RecipeIngredientsAdmin)
 admin.site.register(RecipeInstructions, RecipeInstructionsAdmin)
 admin.site.register(ShoppingList, ShoppingListAdmin)
+admin.site.register(MyRecipe, MyRecipeAdmin)
+admin.site.register(MyRecipeIngredients, MyRecipeIngredientsAdmin)
+admin.site.register(MyRecipeInstructions, MyRecipeInstructionsAdmin)

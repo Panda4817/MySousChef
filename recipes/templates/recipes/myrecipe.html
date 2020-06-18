@@ -28,7 +28,7 @@ MyRecipes
 <section class="best-receipe-area">
     <div class="container">
         <div class="row">
-            <div class="col-12">
+            <div class="col-12 mt-5">
                 <div class="section-heading">
                     <h3>My Liked Recipes</h3>
                 </div>
@@ -42,16 +42,238 @@ MyRecipes
             {% for recipe in recipes %}
             <div class="col-12 col-sm-6 col-lg-4">
                 <div class="single-best-receipe-area mb-30">
-                    <img src="{{ recipe.image }}" alt="recipe picture">
+                    <img src="{{ recipe.recipe_id.image }}" alt="recipe picture">
                     <div class="receipe-content">
-                        <a href="/recipe/{{ recipe.api_id }}">
-                            <h5>{{ recipe.title }}</h5>
+                        <a href="/recipe/{{ recipe.recipe_id.api_id }}">
+                            <h5>{{ recipe.recipe_id.title }}</h5>
                         </a>
                     </div>
                 </div>
             </div>
             {% endfor %}
             {% endif %}
+        </div>
+    </div>
+</section>
+
+<section  class="small-receipe-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section-heading">
+                    <h3>My Recipes</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            {% if myrecipes == None or myrecipes|length == 0 %}
+            <p>No recipes added</p>
+            {% else %}
+            {% for recipe in myrecipes %}
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="single-small-receipe-area d-flex">
+                   
+                    <div class="receipe-thumb">
+                        <img src="static/img/core-img/{{ recipe.recipe_id.image }}" alt="logo image">
+                    </div>
+                    
+                    <div class="receipe-content">
+                        <a href="myrecipe/{{ recipe.recipe_id.id }}">
+                            <h5>{{ recipe.recipe_id.title }}</h5>
+                        </a>
+                        <span>Servings: {{ recipe.recipe_id.serves }}</span>
+                        <span>Ready in: {{ recipe.recipe_id.time }} mins</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section-heading">
+                    <h3>Add to MyRecipes</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+            <form id="addmyrecipeform" action="{% url 'recipes:myrecipe' %}" method="POST">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="col-12">
+                        <h5>Recipe Information:</h5>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-12">
+                        <div class="fieldWrapper">
+                            <div class="form-label-group">
+                                {{ recipeform.title }}
+                                {{ recipeform.title.label_tag }} 
+                                <small style="color: red">{{ recipeform.title.errors }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 col-12">
+                        <div class="fieldWrapper">
+                            <div class="form-label-group">
+                                {{ recipeform.serves }}
+                                {{ recipeform.serves.label_tag }} 
+                                <small style="color: red">{{ recipeform.serves.errors }}</small>
+                            </div>
+                        </div>  
+                    </div>
+                    <div class="form-group col-md-6 col-12">
+                        <div class="fieldWrapper">
+                            <div class="form-label-group">
+                                {{ recipeform.time }}
+                                {{ recipeform.time.label_tag }} 
+                                <small style="color: red">{{ recipeform.time.errors }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-12">
+                        <p>Which image best represents your recipe?</p>
+                    </div>
+                </div>
+                <div class="form-row">
+                    {% for radio in recipeform.image %}
+                    <div class="col-md-4 col-12 form-check">
+                        <label for="{{ radio.id_for_label }}">
+                            {{ radio.tag }}
+                            {% if radio.choice_label == "salad.png" %}
+                            <img src="{% static 'img/core-img/salad.png' %}" alt="salad.png" width='50'>
+                            {% elif radio.choice_label == "pizza.png" %}
+                            <img src="{% static 'img/core-img/pizza.png' %}" alt="pizza.png" width='50'>
+                            {% elif radio.choice_label == "pancake.png" %}
+                            <img src="{% static 'img/core-img/pancake.png' %}" alt="pancake.png" width='50'>
+                            {% elif radio.choice_label == "cake2.png" %}
+                            <img src="{% static 'img/core-img/cake2.png' %}" alt="cake2.png" width='50'>
+                            {% elif radio.choice_label == "hamburger.png" %}
+                            <img src="{% static 'img/core-img/hamburger.png' %}" alt="hamburger.png" width='50'>
+                            {% else %}
+                            <img src="{% static 'img/core-img/rib.png' %}" alt="rib.png" width='50'>
+                            {% endif %}
+                            <small>{{ radio.choice_label }}</small>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-12">
+                        <div class="fieldWrapper">
+                            {{ recipeform.wine_pairing }}
+                            <small style="color: red">{{ recipeform.wine_pairing.errors }}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-12">
+                        <h5>Ingredients:</h5>
+                        <p>Click on the plus to add more ingredients</p>
+                    </div>
+                </div>
+                {{ ingformset.management_form }}
+                {% for form in ingformset %}
+            <div class="form-row ingform-row">
+                <div class="col-12">
+                <div class="form-row">
+                    <div class="form-group col-md-6 col-12">
+                        <div class="fieldWrapper">
+                            <div class="form-label-group">
+                                {{ form.name }}
+                                {{ form.name.label_tag }} 
+                                <small style="color: red">{{ form.name.errors }}</small>
+                            </div>
+                        </div>  
+                    </div>
+                    <div class="form-group col-md-3 col-12">
+                        <div class="fieldWrapper">
+                            <div class="form-label-group">
+                                {{ form.amount }}
+                                {{ form.amount.label_tag }} 
+                                <small style="color: red">{{ form.amount.errors }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3 col-12">
+                        <div class="fieldWrapper">
+                            <div class="form-label-group">
+                                {{ form.unit }}
+                                {{ form.unit.label_tag }} 
+                                <small style="color: red">{{ form.unit.errors }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-12">
+                        <div class="fieldWrapper">
+                            <div class="input-group">
+                                {{ form.meta }}
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-success add-ingform-row" title="Add another ingredient">+</button>
+                                </div>
+                            </div>
+                            <small style="color: red">{{ form.meta.errors }}</small>
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
+                {% endfor %}
+                <div class="form-row">
+                    <div class="col-12">
+                        <h5>Instructions:</h5>
+                        <p>Click on the plus to add more instructions</p>
+                    </div>
+                </div>
+                {{ instrformset.management_form }}
+                {% for form in instrformset %}
+                <div class="form-row instrform-row">
+                    <div class="col-12">
+                <div class="form-row">
+                    <div class="form-group col-md-2 col-12">
+                        <div class="fieldWrapper">
+                            <div class="form-label-group">
+                                {{ form.number }}
+                                {{ form.number.label_tag }} 
+                                <small style="color: red">{{ form.number.errors }}</small>
+                            </div>
+                        </div>  
+                    </div>
+                    <div class="form-group col-md-10 col-12">
+                        <div class="fieldWrapper">
+                            <div class="input-group">
+                                {{ form.step }}
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-success add-instrform-row" title="Add another instruction">+</button>
+                                </div>
+                            </div>
+                            <small style="color: red">{{ form.step.errors }}</small>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="form-row">
+                    <div class="col-12">
+                        <button class="btn btn-block delicious-btn btn-2 text-center" type="submit">Add MyRecipe</button>
+                    </div>
+                </div>
+            </form>
+        </div>
         </div>
     </div>
 </section>

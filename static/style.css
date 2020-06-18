@@ -2007,7 +2007,6 @@ textarea:focus {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  flex: content;
 }
 
 .draggable {

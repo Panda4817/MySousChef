@@ -1,7 +1,8 @@
 from django import forms
+from django.forms import modelformset_factory
 from .models import *
 
-class MyRecipeInfoForm(forms.ModelForms):
+class MyRecipeInfoForm(forms.ModelForm):
     title = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
         'placeholder': 'MyRecipe Title',
@@ -19,11 +20,13 @@ class MyRecipeInfoForm(forms.ModelForms):
         'id': 'timeinput',
         'min': '1',
     }), label='Ready in ... minutes', required=True)
+    image = forms.ChoiceField(widget=forms.RadioSelect(), choices=MyRecipe.IMAGE_CHOICES, required=True)
     wine_pairing = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control',
-        'placeholder': 'Wine Pairing',
         'id': 'wineinput',
-    }), label='Wine Pairing', required=False)
+        'rows': '2',
+        'placeholder': 'Enter wine pairings or other drinks (optional)'
+    }), required=False)
     
     class Meta:
         model = MyRecipe
@@ -32,5 +35,61 @@ class MyRecipeInfoForm(forms.ModelForms):
             'serves',
             'time',
             'wine_pairing',
+            'image'
         )
 
+class IngredientsForm(forms.ModelForm):
+    name = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Ingredient name',
+    }), label='Ingredient name', required=True)
+    amount = forms.DecimalField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Amount' 
+        }), label='Amount', required=True)
+    unit = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Units (optional)',
+    }), label='Units', required=False)
+    meta = forms.CharField(widget=forms.Textarea(attrs={
+        'class': 'form-control',
+        'placeholder': 'Other information about ingredient (optional)',
+        'rows': '2'
+    }), required=False)
+    class Meta:
+        model = MyRecipeIngredients
+        fields = (
+        'name',
+        'amount',
+        'unit',
+        'meta'
+    )
+
+IngredientsFormset = modelformset_factory(
+    MyRecipeIngredients, 
+    form=IngredientsForm, 
+    extra=1)
+
+class InstructionsForm(forms.ModelForm):
+    step = forms.CharField(widget=forms.Textarea(attrs={
+        'class': 'form-control',
+        'placeholder': 'Enter Step information',
+        'rows': '2'
+    }), required=True)
+    number = forms.IntegerField(widget=forms.NumberInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Number',
+        'min': '1',
+        'value': '1' 
+        }), label='Number', required=True)
+    class Meta:
+        model = MyRecipeInstructions
+        fields = (
+            'number',
+            'step'
+        )
+
+InstructionsFormset = modelformset_factory(
+    MyRecipeInstructions, 
+    form=InstructionsForm, 
+    extra=1)

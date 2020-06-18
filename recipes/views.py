@@ -12,6 +12,7 @@ from django.conf import settings
 from dateutil import parser
 import pytz
 import json
+from .forms import *
 
 # Configure clients
 api_client = RecipeClient()
@@ -524,5 +525,53 @@ def delete_list(request):
 
 @login_required(login_url=reverse_lazy("accounts:login"))
 def myrecipe(request):
-    return render(request, 'recipes/myrecipe.html')
+    recipeform = MyRecipeInfoForm()
+    ingredientsformset = IngredientsFormset(prefix="ingform", queryset=MyRecipeIngredients.objects.none())
+    instructionsformset = InstructionsFormset(prefix="instrform", queryset=MyRecipeInstructions.objects.none())
+    likedrecipes = list(UserToRecipe.objects.filter(user=request.user))
+    myrecipes = list(UserToMyRecipe.objects.filter(user=request.user))
+    
+    if request.method == 'POST':
+        recipeform = MyRecipeInfoForm(request.POST)
+        ingredientsformset = IngredientsFormset(request.POST, prefix="ingform")
+        instructionsformset = InstructionsFormset(request.POST, prefix="instrform")
+        if recipeform.is_valid() and ingredientsformset.is_valid() and instructionsformset.is_valid():
+            recipe = recipeform.save()
+            for form in ingredientsformset:
+                ingredient = form.save(commit=False)
+                ingredient.recipe_id = recipe
+                ingredient.save()
+            for form in instructionsformset:
+                instruction = form.save(commit=False)
+                instruction.recipe_id = recipe
+                instruction.save()
+            usertomyrecipe = UserToMyRecipe(user=request.user, recipe_id=recipe)
+            usertomyrecipe.save()
+            messages.success(request, "Recipe added!")
+            return redirect('recipes:myrecipe')
+        
+    context = {
+        'recipeform': recipeform,
+        'ingformset': ingredientsformset,
+        'instrformset': instructionsformset,
+        'recipes': likedrecipes,
+        'myrecipes': myrecipes
+    }
+    return render(request, 'recipes/myrecipe.html', context)
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def myrecipe_page(request, recipe_id):
+    try:
+        recipe = MyRecipe.objects.get(pk=recipe_id)
+    except MyRecipe.DoesNotExist:
+        messages.error(request, "Recipe does not exist")
+        return redirect('recipes:myrecipe')
+    ingredients = list(MyRecipeIngredients.objects.filter(recipe_id=recipe))
+    steps = list(MyRecipeInstructions.objects.filter(recipe_id=recipe).order_by('number'))
+    context = {
+        'recipe': recipe,
+        'ingredients': ingredients,
+        'steps': steps
+    }
+    return render(request, 'recipes/myrecipe_page.html', context)
 

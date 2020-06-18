@@ -72,20 +72,33 @@ class ShoppingList(models.Model):
     name = models.CharField(max_length=100)
 
 class MyRecipe(models.Model):
+    IMAGE_CHOICES = [
+        ('salad.png', 'salad.png'),
+        ('pizza.png', 'pizza.png'),
+        ('pancake.png', 'pancake.png'),
+        ('cake2.png', 'cake2.png'),
+        ('hamburger.png', 'hamburger.png'),
+        ('rib.png', 'rib.png'),
+    ]
     title = models.CharField(max_length=200)
     serves = models.PositiveIntegerField()
     time = models.PositiveIntegerField()
     wine_pairing = models.TextField(blank=True)
+    image = models.CharField(max_length=64, default="salad.png", choices=IMAGE_CHOICES)
 
 class MyRecipeIngredients(models.Model):
     recipe_id = models.ForeignKey(MyRecipe, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=7, decimal_places=3)
-    unit = models.CharField(max_length=64)
+    unit = models.CharField(max_length=64, blank=True)
     meta = models.CharField(max_length=200, blank=True)
 
 class MyRecipeInstructions(models.Model):
     recipe_id = models.ForeignKey(MyRecipe, on_delete=models.CASCADE)
     number = models.PositiveIntegerField()
     step = models.TextField()
+
+class UserToMyRecipe(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe_id = models.ForeignKey(MyRecipe, on_delete=models.CASCADE)
 
