@@ -641,3 +641,35 @@ def extra_ingredient_info(request):
         response.status_code = 200
         return response
     return redirect('recipes:myrecipe')
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def delete_liked(request):
+    if request.method == 'POST':
+        recipe_id = request.POST['id']
+        recipe  = Recipes.objects.get(pk=recipe_id)
+        items = list(UserToRecipe.objects.filter(user=request.user).filter(recipe_id=recipe))
+        if len(items) == 1:
+            item = UserToRecipe.objects.get(pk=items[0].id)
+            item.delete()
+        else:
+            print("error")
+        data = {
+            'id': recipe_id
+        }
+        response = JsonResponse(data)
+        response.status_code = 200
+        return response
+    return redirect('recipes:myrecipe')
+
+@login_required(login_url=reverse_lazy("accounts:login"))
+def delete_myrecipe(request):
+    recipe_id = request.POST['recipe_id']
+    recipe  = MyRecipe.objects.get(pk=recipe_id)
+    items = list(UserToMyRecipe.objects.filter(user=request.user).filter(recipe_id=recipe))
+    if len(items) == 1:
+        item = UserToMyRecipe.objects.get(pk=items[0].id)
+        item.delete()
+    else:
+        print("error")
+    messages.info(request, "Recipe deleted")
+    return redirect('recipes:myrecipe')

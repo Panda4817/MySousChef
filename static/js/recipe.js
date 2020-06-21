@@ -141,6 +141,22 @@ function extrainfo(data) {
     });
 }
 
+function deleteliked(data) {
+    $.ajax({
+        type: "POST",
+        url: '/delete-liked',
+        data: {
+            'id': data
+        },
+        headers: {
+            'X-CSRFToken':  document.getElementById('addmyrecipeform').firstElementChild.value
+        },
+    })
+    .done(function (data) {
+        document.querySelector('#liked'+data.id).remove();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     $(document).on('click', '.add-ingform-row', function(e){
         e.preventDefault();

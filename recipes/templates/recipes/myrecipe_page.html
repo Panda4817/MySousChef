@@ -26,7 +26,7 @@ MyRecipe {{ recipe.id }}
     <div class="container">
 
         <div class="row align-items-end">
-            <div class="col-12 col-md-8">
+            <div class="col-12 col-md-6">
                 <div class="receipe-headline my-5">
                     <h2>{{ recipe.title }}</h2>
                     <div class="receipe-duration">
@@ -35,9 +35,19 @@ MyRecipe {{ recipe.id }}
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-3">
                 <div class="receipe-headline my-5">
                 <img class="img-fluid mx-auto d-block" src="{% static '/img/core-img/'|add:recipe.image }} %}" alt="recipe picture">
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="receipe-headline my-5">
+                    <form action="{% url 'recipes:delete_myrecipe' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="text" value="{{ recipe.id }}" hidden name="recipe_id">
+                        <button type="submit" class="btn delicious-btn btn-4 little"><i class="fas fa-trash-alt"></i></button>  
+                    </form>
+                    
                 </div>
             </div>
         </div>
@@ -79,5 +89,7 @@ MyRecipe {{ recipe.id }}
         {% endif %}
     </div>
 </div>
+
+
 <script src="{% static 'js/recipe.js' %}"></script>
 {% endblock %}

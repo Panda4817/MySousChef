@@ -8,14 +8,14 @@ MyRecipes
 
 {% block body %}
 <!-- ##### CTA Area Start ##### -->
-<section class="cta-area bg-img bg-overlay" style="background-image: url({% static 'img/bg-img/bg7.jpg' %});">
+<section class="cta-area bg-img bg-overlay" style="background-image: url({% static 'img/bg-img/bg5.jpg' %});">
     <div class="container h-100">
         <div class="row h-100 align-items-center">
             <div class="col-12">
                 <!-- Cta Content -->
                 <div class="cta-content text-center">
                     <h2>MyRecipes</h2>
-                    <p>Find all liked recipes and add own recipes here.</p>
+                    <p>Find all liked recipes and add own recipes below.</p>
                     <a href="{% url 'recipes:search_recipes' %}" class="btn delicious-btn">Search Recipes</a>
                    
                 </div>
@@ -40,13 +40,13 @@ MyRecipes
             <p>No liked recipes</p>
             {% else %}
             {% for recipe in recipes %}
-            <div class="col-12 col-sm-6 col-lg-4">
+            <div id="liked{{ recipe.recipe_id.id }}" class="col-12 col-sm-6 col-lg-4">
                 <div class="single-best-receipe-area mb-30">
                     <img src="{{ recipe.recipe_id.image }}" alt="recipe picture">
                     <div class="receipe-content">
-                        <a href="/recipe/{{ recipe.recipe_id.api_id }}">
+                        <a href="/recipe/{{ recipe.recipe_id.api_id }}" class="float-left">
                             <h5>{{ recipe.recipe_id.title }}</h5>
-                        </a>
+                        </a> <i class="fas fa-trash-alt btn delicious-btn btn-4 little" onclick="deleteliked('{{ recipe.recipe_id.id }}')"></i>
                     </div>
                 </div>
             </div>
