@@ -50,6 +50,9 @@ function simplesearch() {
         },
     })
     .done(function (data) {
+        let d = JSON.stringify(data);
+        localStorage.setItem('results', d);
+        console.log(localStorage.getItem('results'));
         if (data.message) {
             document.getElementById('searcherror').innerHTML = data.message;
             document.getElementById('searcherror').style.display = "block";
@@ -58,6 +61,7 @@ function simplesearch() {
             }, 5000);
         }
         updateresults(data);
+        window.location = "search-recipes#results";
         y = document.getElementById('results').getBoundingClientRect().top + window.pageYOffset - 100;
         window.scrollTo({ top: y, behavior: 'smooth' });
         return;
@@ -116,6 +120,9 @@ function advancedsearch() {
         },
     })
     .done(function (data) {
+        let d = JSON.stringify(data);
+        localStorage.setItem('results', d);
+        console.log(localStorage.getItem('results'));
         if (data.message) {
             document.getElementById('advancederror').innerHTML = data.message;
             document.getElementById('advancederror').style.display = "block";
@@ -124,6 +131,7 @@ function advancedsearch() {
             }, 5000);
         }
         updateresults(data);
+        window.location = "search-recipes#results";
         $('#collapse').collapse('hide')
         y = document.getElementById('results').getBoundingClientRect().top + window.pageYOffset - 50;
         window.scrollTo({ top: y, behavior: 'smooth' });
@@ -138,3 +146,16 @@ function advancedsearch() {
         return;
     })
 }
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.location.hash != "#results"){
+        localStorage.clear();
+    }
+    if (!(localStorage.getItem('results')))
+        localStorage.setItem('results', '');
+    let data = localStorage.getItem('results');
+    if (data != "") {
+        var datas = JSON.parse(data);
+        updateresults(datas);
+    }
+       
+});

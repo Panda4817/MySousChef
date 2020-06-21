@@ -7,6 +7,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from .models import *
+import pprint
 
 api_key = os.getenv('API_KEY')
 
@@ -52,7 +53,7 @@ class RecipeClient(object):
         return response
     
     def get_recipes_similar(self, recipe_id):
-        filters = {'number': 5}
+        filters = {'number': 2}
         response = self._get('/recipes/{}/similar'.format(recipe_id), filters)
         return response
     
@@ -280,9 +281,7 @@ def prepare_simple_results(results):
             'message': "No results with just MyPantry items. Add more items to MyPantry. Below are results in order of lowest to highest missing ingredients.",
             'recipes': found,
         }
-        response = JsonResponse(data)
-        response.status_code = 200
-        return response
+        return data
     
     for i in recipes:
         for j in database:
@@ -361,9 +360,7 @@ def prepare_simple_results(results):
                 ing.save()
         
     data = {'recipes': found}
-    response = JsonResponse(data)
-    response.status_code = 200
-    return response
+    return data
 
 def prepare_advance_results(results):
     if len(results['results']) == 0:
@@ -452,4 +449,100 @@ def prepare_advance_results(results):
     response = JsonResponse(data)
     response.status_code = 200
     return response
+
+def convertunit(name, unit, amount):
+    metric_weight = ['g', 'kg']
+    metric_volume = ['ml', 'l']
+    weight = False
+    volume = False
+    amount = float(amount)
+    if unit.lower() in metric_weight:
+        if unit == 'g':
+            unit = 'grams'
+        else:
+            unit = 'kilograms'
+        weight = True
+    elif unit.lower() in metric_volume:
+        if unit == 'ml':
+            unit = 'millilitres'
+        else:
+            unit = 'litres'
+        volume = True
+    else:
+        return None
+    api_client = RecipeClient()
+    result = ""
+    if weight == True:
+        if unit == 'kilograms':
+            result = api_client.convert(name, amount, unit, "pounds")
+        else:
+            if amount > 500:
+                result = api_client.convert(name, amount, unit, "pounds")
+            else:
+                result = api_client.convert(name, amount, unit, "ounces")
+    else:
+        if unit == 'litres':
+            result = api_client.convert(name, amount, unit, "pints")
+        else:
+            if amount > 500:
+                result = api_client.convert(name, amount, unit, "pints")
+            else:
+                result = api_client.convert(name, amount, unit, "cup")
+    return result['answer']
         
+def get_similar_recipes(others):
+    similar = []
+    api_client = RecipeClient()
+    for other in others:
+        try:
+            sim = Recipes.objects.get(api_id=other['id'])
+        except Recipes.DoesNotExist:
+            n = api_client.get_recipe_info(other['id'])
+            pprint.pprint(n)
+            if n['winePairing']:
+                sim = Recipes(
+                    api_id=n['id'],
+                    title=n['title'],
+                    image=n['image'],
+                    serves=n['servings'],
+                    time=n['readyInMinutes'],
+                    source_url=n['sourceUrl'],
+                    credit=n['creditsText'],
+                    health_score=n['healthScore'],
+                    popularity=n['aggregateLikes'],
+                    wine_pairing=n['winePairing']['pairingText']
+                )
+            else:
+                sim = Recipes(
+                    api_id=n['id'],
+                    title=n['title'],
+                    image=n['image'],
+                    serves=n['servings'],
+                    time=n['readyInMinutes'],
+                    source_url=n['sourceUrl'],
+                    credit=n['creditsText'],
+                    health_score=n['healthScore'],
+                    popularity=n['aggregateLikes'],
+                    wine_pairing="None"
+                )
+            sim.save()
+            for j in n['extendedIngredients']:
+                amount = j['measures']['metric']['amount']
+                unit = j['measures']['metric']['unitShort']
+                name = j['name']
+                if j['meta']:
+                    meta = ', '.join(j['meta'])
+                else:
+                    meta = ''
+                ing = RecipeIngredients(
+                    recipe_id=sim,
+                    name=name,
+                    amount=amount,
+                    unit=unit,
+                    meta=meta
+                )
+                ing.save()
+        similar.append(sim)
+    return similar
+    
+

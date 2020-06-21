@@ -11,27 +11,58 @@ Home
         <!-- Single Hero Slide -->
         <div class="single-hero-slide bg-img" style="background-image: url({% static 'img/bg-img/bg1.jpg' %});">
             <div class="container h-100">
-                <div class="row h-100 align-items-center">
-                    <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+                <div class="row h-100 align-items-start">
+                    <div class="col-12 col-md-9 col-lg-7 col-xl-6 p-5">
                         <div class="hero-slides-content" data-animation="fadeInUp" data-delay="100ms">
-                            <h2 data-animation="fadeInUp" data-delay="300ms">Search Recipes by ingredients</h2>
-                            <p data-animation="fadeInUp" data-delay="700ms">We will only show you recipes with the ingredients you specified</p>
-                    
+                            <h2 data-animation="fadeInUp" data-delay="300ms">Most Recent Use by/Best Before dates </h2>
+                            <h6 style="color: lightgray;font-weight: lighter;">(Frozen items are not included in this list)<h6>
+                            {% for item in items %}
+                            {% if item.usebefore != None %}
+                            <p class="dashboard" data-animation="fadeInUp" data-delay="700ms">{{ item.pantry_item.name|title }} - {{ item.usebefore_text|title }} <span class="date">{{ item.usebefore }}</span></p>
+                            {% endif %}
+                            {% endfor %}
+                            <a href="{% url 'recipes:pantry' %}" class="btn delicious-btn" data-animation="fadeInUp" data-delay="1000ms">MyPantry</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+       <!-- Single Hero Slide -->
+       <div class="single-hero-slide bg-img" style="background-image: url({% static 'img/bg-img/bg4.jpg' %});">
+        <div class="container h-100">
+            <div class="row h-100 align-items-start">
+                <div class="col-12 col-md-9 col-lg-7 col-xl-6 p-5">
+                    <div class="hero-slides-content" data-animation="fadeInUp" data-delay="100ms">
+                        <h2 data-animation="fadeInUp" data-delay="300ms">Opened pantry items and their use-within information</h2>
+                        <h6 style="color: lightgray;font-weight: lighter;">(Frozen items are not included in this list)<h6>
+                        {% for open in opens %}
+                        {% if open.opened != None %}
+                        <p class="dashboard" data-animation="fadeInUp" data-delay="700ms">{{ open.pantry_item.name|title }} - opened <span class="date-open">{{ open.opened }}</span> 
+                            {% if open.use_within %}
+                            - use within {{ open.use_within }}
+                            {% endif %}
+                        </p>
+                        {% endif %}
+                        {% endfor %}
+                        <a href="{% url 'recipes:pantry' %}" class="btn delicious-btn" data-animation="fadeInUp" data-delay="1000ms">MyPantry</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
         <!-- Single Hero Slide -->
         <div class="single-hero-slide bg-img" style="background-image: url({% static 'img/bg-img/bg6.jpg' %});">
             <div class="container h-100">
-                <div class="row h-100 align-items-center">
-                    <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+                <div class="row h-100 align-items-start">
+                    <div class="col-12 col-md-9 col-lg-7 col-xl-6 p-5">
                         <div class="hero-slides-content" data-animation="fadeInUp" data-delay="100ms">
-                            <h2 data-animation="fadeInUp" data-delay="300ms">Create or log in to your account and keep track of your pantry</h2>
-                            <p data-animation="fadeInUp" data-delay="700ms">Never forget how long ago that jar in your fridge has been opened for</p>
-                            
+                            <h2 data-animation="fadeInUp" data-delay="300ms">MyShoppingList</h2>
+                            {% for name in names %}
+                            <p class="dashboard" data-animation="fadeInUp" data-delay="700ms">{{ name.name|title }}</p>
+                            {% endfor %}
+                            <a href="{% url 'recipes:shopping_list' %}" class="btn delicious-btn" data-animation="fadeInUp" data-delay="1000ms">MyShoppingList</a>
                         </div>
                     </div>
                 </div>
@@ -41,12 +72,14 @@ Home
         <!-- Single Hero Slide -->
         <div class="single-hero-slide bg-img" style="background-image: url({% static 'img/bg-img/bg7.jpg' %});">
             <div class="container h-100">
-                <div class="row h-100 align-items-center">
-                    <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+                <div class="row h-100 align-items-start">
+                    <div class="col-12 col-md-9 col-lg-7 col-xl-6 p-5">
                         <div class="hero-slides-content" data-animation="fadeInUp" data-delay="100ms">
-                            <h2 data-animation="fadeInUp" data-delay="300ms">Plan meals and create shopping lists</h2>
-                            <p data-animation="fadeInUp" data-delay="700ms">Your personal sous chef</p>
-                            
+                            <h2 data-animation="fadeInUp" data-delay="300ms">Recently Liked Recipes</h2>
+                            {% for recipe in recipes %}
+                            <p class="dashboard" data-animation="fadeInUp" data-delay="700ms">{{ recipe.recipe_id.title|title }}</p>
+                            {% endfor %}
+                            <a href="{% url 'recipes:myrecipe' %}" class="btn delicious-btn" data-animation="fadeInUp" data-delay="1000ms">MyRecipes</a>
                         </div>
                     </div>
                 </div>
@@ -56,5 +89,40 @@ Home
 </section>
 <!-- ##### Hero Area End ##### -->
 
+<!-- ##### Top Catagory Area Start ##### -->
+<section class="top-catagory-area section-padding-80-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section-heading">
+                    <h3>Good <span id="greeting"></span> {{ user.username }}</h3>
+                    <p>Here are some recipes you can create using most of your pantry items</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Top Catagory Area -->
+            {% if data.message and data.recipes == None %}
+            <p>{{ data.message }}</p>
+            {% else %}
+            {% for precipe in data.recipes %}
+            <div class="col-12 col-lg-6">
+                <div class="single-top-catagory">
+                    <img src="{{ precipe.image }}" alt="">
+                    <!-- Content -->
+                    <div class="top-cta-content">
+                        <h3>{{ precipe.title }}</h3>
+                        <a href="recipe/{{ precipe.id }}" class="btn delicious-btn">See Full Receipe</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+            <!-- Top Catagory Area -->
+        </div>
+    </div>
+</section>
+<!-- ##### Top Catagory Area End ##### -->
 
+<script src="{% static 'js/dashboard.js' %}"></script>
 {% endblock %}

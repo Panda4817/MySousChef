@@ -78,12 +78,22 @@ Recipe
             <div class="col-12 col-lg-4">
                 <div class="ingredients">
                     <h4>Ingredients</h4>
+                    <h6>click on <i class="fas fa-exchange-alt"></i> to see substitutions and other units of measurements</h6>
                     <ul>
                         {% for ingredient in ingredients %}
-                        <li class="mb-1">{{ ingredient.amount|floatformat }} 
-                            {% if ingredient.unit %}{{ ingredient.unit|lower }} of {% endif %}
-                            {{ ingredient.name }}
+                        <li class="mb-1">
+                            <button type="button" class="btn btn-4 delicious-btn little" onclick="extrainfo('{{ ingredient.id }}');"><i class="fas fa-exchange-alt"></i></button>
+                            <span id="amount{{ ingredient.id }}">{{ ingredient.amount|floatformat }}</span> 
+                            {% if ingredient.unit %}
+                            {% if ingredient.unit|lower == "large" or ingredient.unit|lower == "medium" or ingredient.unit|lower == "small" %}
+                            {{ ingredient.unit|lower }}
+                            {% else %}
+                            <span id="unit{{ ingredient.id }}">{{ ingredient.unit|lower }}</span> of 
+                            {% endif %}
+                            {% endif %}
+                            <span id="name{{ingredient.id }}">{{ ingredient.name }}</span>
                             {% if ingredient.meta %} -  {{ ingredient.meta }}{% endif %}
+                            <div id="extra{{ ingredient.id }}"></div>
                         </li>
                         {% endfor %}
                     </ul> 
@@ -98,7 +108,44 @@ Recipe
             </div>
         </div>
         {% endif %}
+        <div class="row">
+            <div class="col-12">
+                <h4>Similar Recipes</h4>
+            </div>
+        </div>
+        <div class="row">
+            {% for sim in similar %}
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="single-small-receipe-area d-flex">
+                   
+                    <div class="receipe-thumb">
+                        <img src="{{ sim.image }}" alt="result image">
+                    </div>
+                    
+                    <div class="receipe-content">
+                        <a href="/recipe/{{ sim.api_id }}">
+                            <h5>{{ sim.title|title }}</h5>
+                        </a>
+                        <span>Servings: {{ sim.serves }}</span>
+                        <span>Ready in: {{ sim.time }} mins</span>
+                        <span>Healthiness: {{ sim.health_score }}</span>
+                        <span>Likes: {{ sim.popularity }}</span>
+                        <span><a href="{{ sim.source_url }}">{{ sim.credit|title }}</a></span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+{% verbatim %}
+<script id="extra_template" type="text/template">
+    <p>Substitutions: <span style="color: #40ba37;">{{ subs }}</span></p>
+    <p>Imperial measurement: <span style="color: #40ba37;">{{ imperial }}</span></p>
+    <button type="button" class="btn btn-4 delicious-btn little" onclick="closeinfo('{{ id }}');">Close</button>
+</script>
+{% endverbatim %}
 <script src="{% static 'js/recipe.js' %}"></script>
 {% endblock %}

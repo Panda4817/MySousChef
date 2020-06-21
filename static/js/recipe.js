@@ -1,3 +1,5 @@
+
+
 function addtoliked(data) {
     $.ajax({
         type: "POST",
@@ -76,6 +78,69 @@ function deleteForm(prefix, btn, name) {
     return false;
 }
 
+function checktext(data) {
+    'use strict';
+    let inputvalue = document.getElementById(data).value;
+    if (inputvalue.length < 1) {
+        document.getElementById(data).classList.remove('is-valid');
+        document.getElementById(data).classList.add('is-invalid');
+    } else {
+        document.getElementById(data).classList.add('is-valid');
+        document.getElementById(data).classList.remove('is-invalid');
+    }
+}
+
+function checknumber(data) {
+    'use strict';
+    let inputvalue = document.getElementById(data).value;
+    if (inputvalue < 1) {
+        document.getElementById(data).classList.remove('is-valid');
+        document.getElementById(data).classList.add('is-invalid');
+    } else {
+        document.getElementById(data).classList.add('is-valid');
+        document.getElementById(data).classList.remove('is-invalid');
+    }
+}
+function closeinfo(data) {
+    let div = document.getElementById('extra'+data);
+    div.style.display = "none";
+}
+
+function extrainfo(data) {
+    let name = document.getElementById('name'+data).innerText;
+    let amount = document.getElementById('amount'+data).innerText;
+    let unit = document.getElementById('unit'+data);
+    if (unit == null)
+        unit = "None";
+    else 
+        unit = document.getElementById('unit'+data).innerText;
+    $.ajax({
+        type: "POST",
+        url: '/extra-ingredient-info',
+        data: {
+            'name': name,
+            'amount': amount,
+            'unit': unit,
+            'id': data
+        },
+        headers: {
+            'X-CSRFToken':  document.getElementById('addtolikedform').firstElementChild.value
+        },
+    })
+    .done(function (data) {
+        console.log(data);
+        const template = Handlebars.compile(document.querySelector('#extra_template').innerHTML);
+        const content = template({
+            'subs': data.subs,
+            'imperial': data.imperial,
+            'id': data.id
+        });
+        console.log(content);
+        document.querySelector('#extra'+data.id).innerHTML = content;
+        document.querySelector('#extra'+data.id).style.display = "block";
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     $(document).on('click', '.add-ingform-row', function(e){
         e.preventDefault();
@@ -97,4 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteForm('instrform', $(this), 'instrform');
         return false;
     });
+
 });
+

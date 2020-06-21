@@ -420,6 +420,11 @@ textarea:focus {
   text-transform: capitalize;
   background-color: #40ba37;
 }
+.delicious-btn.little {
+  height: fit-content !important;
+  padding: 10px !important;
+  min-width: auto !important;
+}
 .delicious-btn.active, .delicious-btn:hover, .delicious-btn:focus {
   font-size: 16px;
   font-weight: 600;
@@ -449,10 +454,17 @@ textarea:focus {
   line-height: 53px;
   color: #40ba37;
 }
+.delicious-btn.btn-4.little {
+  line-height: normal !important;
+}
 @media only screen and (max-width:767px) {
   .delicious-btn.btn-4 {
     height: 40px;
     line-height: 33px;
+  }
+  .delicious-btn.btn-4.little {
+    height: fit-content !important;
+    line-height: normal !important;
   }
 }
 .delicious-btn.btn-4.active, .delicious-btn.btn-4:hover, .delicious-btn.btn-4:focus {
@@ -460,16 +472,28 @@ textarea:focus {
   color: #ffffff;
   background-color: #40ba37;
 }
+.delicious-btn.btn-4.active.little, .delicious-btn.btn-4:hover.little, .delicious-btn.btn-4:focus.little {
+  height: fit-content !important;
+  line-height: normal !important;
+}
 @media only screen and (max-width:767px) {
   .delicious-btn.btn-4.active, .delicious-btn.btn-4:hover, .delicious-btn.btn-4:focus {
     height: 40px;
     line-height: 33px;
+  }
+  .delicious-btn.btn-4.active.little, .delicious-btn.btn-4:hover.little, .delicious-btn.btn-4:focus.little {
+    height: fit-content !important;
+    line-height: normal !important;
   }
 }
 @media only screen and (max-width:767px) {
   .delicious-btn {
     height: 40px;
     line-height: 39px;
+  }
+  .delicious-btn.little {
+    height: fit-content !important;
+    line-height: normal !important;
   }
 }
 
@@ -746,6 +770,9 @@ textarea:focus {
   font-size: 16px;
   margin-bottom: 50px;
   color: #ffffff;
+}
+.hero-slides .single-hero-slide .hero-slides-content p.dashboard {
+  margin-bottom: 10px !important;
 }
 .hero-slides .owl-prev,
 .hero-slides .owl-next {
@@ -2128,6 +2155,14 @@ textarea:focus {
 
 .tooltip.show {
   opacity: 1 !important;
+}
+
+.today {
+  color: orangered;
+}
+
+.past {
+  color: red;
 }
 
 /*# sourceMappingURL=style.css.map */

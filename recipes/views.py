@@ -5,7 +5,7 @@ from django.contrib.auth.signals import user_logged_out, user_logged_in
 from .signals import show_login_message, show_logout_message
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .utils import RecipeClient, check_list, addToPantry, prepare_simple_results, prepare_advance_results
+from .utils import *
 from .models import *
 from datetime import datetime
 from django.conf import settings
@@ -13,6 +13,7 @@ from dateutil import parser
 import pytz
 import json
 from .forms import *
+import pprint
 
 # Configure clients
 api_client = RecipeClient()
@@ -20,7 +21,38 @@ api_client = RecipeClient()
 # Create your views here.
 @login_required(login_url=reverse_lazy("accounts:login"))
 def dashboard(request):
-    return render(request, 'recipes/dashboard.html')
+    items = list(UserToPantry.objects.filter(user=request.user).exclude(frozen__isnull=False).order_by('usebefore')[:5])
+    for item in items:
+        if item.usebefore != None:
+            item.usebefore = (item.usebefore).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    opens = list(UserToPantry.objects.filter(user=request.user).exclude(frozen__isnull=False).order_by('opened')[:5])
+    for o in opens:
+        if o.opened != None:
+            o.opened = (o.opened).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    shopping = list(ShoppingList.objects.filter(user=request.user)[:5])
+    recipes = list(UserToRecipe.objects.filter(user=request.user).order_by('-added')[:5])
+    data = {}
+    pantry_items = list(UserToPantry.objects.filter(user=request.user))
+    if len(pantry_items) == 0:
+        data = {'message': "No items in MyPantry to search with. Add ingredients to MyPantry.", 'recipes': None}
+    names = [] 
+    for i in pantry_items:
+        names.append(i.pantry_item.name)
+    results = api_client.search_recipes_ingredients(names)
+    if len(results) == 0:
+        data = {
+            'message': "No results. Add more items to MyPantry.",
+            'recipes': None
+        }
+    data = prepare_simple_results(results)
+    context = {
+        'items': items,
+        'names': shopping,
+        'recipes': recipes,
+        'opens': opens,
+        'data': data
+    }
+    return render(request, 'recipes/dashboard.html', context)
 
 @login_required(login_url=reverse_lazy("accounts:login"))
 def search_ingredients(request):
@@ -314,7 +346,9 @@ def search_simple(request):
             response.status_code = 400
             return response
         
-        response = prepare_simple_results(results)
+        data = prepare_simple_results(results)
+        response = JsonResponse(data)
+        response.status_code = 200
         return response
     return redirect('recipes:search_recipes')
 
@@ -431,10 +465,13 @@ def recipe(request, recipe_id):
             )
             instruction.save()
     steps = list(RecipeInstructions.objects.filter(recipe_id=recipe).order_by('step'))
+    others = api_client.get_recipes_similar(recipe_id)
+    similar = get_similar_recipes(others)
     context = {
         'recipe': recipe,
         'ingredients': ingredients,
-        'steps': steps
+        'steps': steps,
+        'similar': similar
     }
     return render(request, 'recipes/recipe.html', context)
 
@@ -575,3 +612,32 @@ def myrecipe_page(request, recipe_id):
     }
     return render(request, 'recipes/myrecipe_page.html', context)
 
+@login_required(login_url=reverse_lazy("accounts:login"))
+def extra_ingredient_info(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+        unit = request.POST['unit']
+        amount = request.POST['amount']
+        ingid = request.POST['id']
+        subs = ""
+        imperial = ""
+        if unit == "None":
+            imperial = "No unit conversion available"
+        else:
+            imperial = convertunit(name, unit, amount)
+        results = api_client.get_substitute_name(name)
+        if results['status'] == "failure":
+            subs = "No substitutes found"
+        else:
+            subs = ', '.join(results['substitutes'])  
+        if imperial == None:
+            imperial = "No unit conversion available"        
+        data = {
+            'subs': subs,
+            'imperial': imperial,
+            'id': ingid
+        }
+        response = JsonResponse(data)
+        response.status_code = 200
+        return response
+    return redirect('recipes:myrecipe')

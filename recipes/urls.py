@@ -26,4 +26,5 @@ urlpatterns = [
     path("shopping-list", views.shopping_list, name="shopping_list"),
     path("add-list", views.add_list, name="add_list"),
     path("delete-list", views.delete_list, name="delete_list"),
+    path("extra-ingredient-info", views.extra_ingredient_info, name="extra_ingredient_info")
 ]

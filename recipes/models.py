@@ -66,6 +66,7 @@ class RecipeInstructions(models.Model):
 class UserToRecipe(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     recipe_id = models.ForeignKey(Recipes, on_delete=models.CASCADE)
+    added = models.DateTimeField(default=timezone.now)
 
 class ShoppingList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

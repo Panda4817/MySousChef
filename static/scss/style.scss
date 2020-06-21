@@ -425,6 +425,11 @@ textarea:focus {
     font-size: 16px;
     line-height: 58px;
     font-weight: 600;
+    &.little {
+        height: fit-content !important;
+        padding: 10px !important;
+        min-width: auto !important;
+    }
     @include trans-duration(500ms);
     text-transform: capitalize;
     background-color: $bg-default;
@@ -461,10 +466,17 @@ textarea:focus {
         background-color: white;
         border: 3px solid $bg-default;
         line-height: 53px;
+        &.little {
+            line-height: normal !important;
+        }
         color: $bg-default;
         @media #{$breakpoint-xs} {
             height: 40px;
             line-height: 33px;
+            &.little {
+                height: fit-content !important;
+                line-height: normal !important;
+            }
         }
         &.active,
         &:hover,
@@ -472,15 +484,27 @@ textarea:focus {
             line-height: 53px;
             color: $white-color;
             background-color: $bg-default;
+            &.little {
+                height: fit-content !important;
+                line-height: normal !important;
+            }
             @media #{$breakpoint-xs} {
                 height: 40px;
                 line-height: 33px;
+                &.little {
+                    height: fit-content !important;
+                    line-height: normal !important;
+                }
             }
         }
     }
     @media #{$breakpoint-xs} {
         height: 40px;
         line-height: 39px;
+        &.little {
+            height: fit-content !important;
+            line-height: normal !important;
+        }
     }
 }
 
@@ -740,6 +764,9 @@ textarea:focus {
                 font-size: 16px;
                 margin-bottom: 50px;
                 color: $white-color;
+                &.dashboard {
+                    margin-bottom: 10px !important;
+                }
             }
         }
     }
@@ -2065,7 +2092,13 @@ color: #777;
 .tooltip.show {
     opacity: 1 !important;
 } 
-       
+
+.today {
+    color: orangered;
+}
+.past {
+    color: red;
+}
         
         
         

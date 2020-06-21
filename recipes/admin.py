@@ -54,6 +54,14 @@ class MyRecipeInstructionsAdmin(admin.ModelAdmin):
     model = MyRecipeInstructions
     list_display = ['pk', 'recipe_id', 'number', 'step']
 
+class UserToRecipeAdmin(admin.ModelAdmin):
+    model = UserToRecipe
+    list_display = ['pk', 'user', 'recipe_id', 'added']
+
+class UserToMyRecipeAdmin(admin.ModelAdmin):
+    model = UserToMyRecipe
+    list_display = ['pk', 'user', 'recipe_id']
+
 
 admin.site.register(Pantry, PantryAdmin)
 admin.site.register(UserToPantry, UserToPantryAdmin)
@@ -64,3 +72,6 @@ admin.site.register(ShoppingList, ShoppingListAdmin)
 admin.site.register(MyRecipe, MyRecipeAdmin)
 admin.site.register(MyRecipeIngredients, MyRecipeIngredientsAdmin)
 admin.site.register(MyRecipeInstructions, MyRecipeInstructionsAdmin)
+admin.site.register(UserToMyRecipe, UserToMyRecipeAdmin)
+admin.site.register(UserToRecipe, UserToRecipeAdmin)
+

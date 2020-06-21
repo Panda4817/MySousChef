@@ -423,7 +423,7 @@ function addtopsection(data, name) {
         document.getElementById(name+'ref'+data.id).value = data.date;
         addMonthDay(data.id);
         if (data.datetext)
-            document.getElementById('usetxt'+data.id).innerHTML = data.datetext;
+            document.getElementById('usetxt'+data.id).innerHTML = ' until ' + data.datetext + ' date ';
     } else {
         let row = document.createElement('div');
         row.id = name+'section'+data.id;
@@ -459,7 +459,7 @@ function addtopsection(data, name) {
 function changeuseby(data) {
     let usetext = $("input[name='radiotext"+data+"']:checked").val();
     let usedate = document.getElementById('inputuse'+data).value;
-    let t = "00:00:00.000Z"
+    let t = "12:00:00.000Z"
     var utc = usedate + 'T' + t
 
     $.ajax({
@@ -494,7 +494,7 @@ function changeuseby(data) {
 
 function changeopen(data) {
     let usedate = document.getElementById('inputopen'+data).value;
-    let t = "00:00:00.000Z"
+    let t = "12:00:00.000Z"
     var utc = usedate + 'T' + t
 
     $.ajax({
@@ -526,7 +526,7 @@ function changeopen(data) {
 
 function changefrozen(data) {
     let usedate = document.getElementById('inputfrozen'+data).value;
-    let t = "00:00:00.000Z"
+    let t = "12:00:00.000Z"
     var utc = usedate + 'T' + t
 
     $.ajax({
