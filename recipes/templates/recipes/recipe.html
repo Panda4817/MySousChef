@@ -119,7 +119,11 @@ Recipe
                 <div class="single-small-receipe-area d-flex">
                    
                     <div class="receipe-thumb">
+                        {% if sim.image == "static/img/core-img/salad.png" %}
+                        <img src="{% static 'img/core-img/salad.png' %}" alt="result image">
+                        {% else %}
                         <img src="{{ sim.image }}" alt="result image">
+                        {% endif %}
                     </div>
                     
                     <div class="receipe-content">

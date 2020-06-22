@@ -35,7 +35,7 @@ class RecipeClient(object):
 
 
     def search_recipes_ingredients(self, ingredients):
-        filters = {'ingredients': ','.join(ingredients), 'number': 2, 'limitLicense': False, 'ranking': 2, 'ignorePantry': False}
+        filters = {'ingredients': ','.join(ingredients), 'number': 10, 'limitLicense': False, 'ranking': 2, 'ignorePantry': False}
         response = self._get('/recipes/findByIngredients', filters)
         return response
     
@@ -492,6 +492,7 @@ def convertunit(name, unit, amount):
         
 def get_similar_recipes(others):
     similar = []
+    not_found = []
     api_client = RecipeClient()
     for other in others:
         try:
@@ -499,31 +500,25 @@ def get_similar_recipes(others):
         except Recipes.DoesNotExist:
             n = api_client.get_recipe_info(other['id'])
             pprint.pprint(n)
-            if n['winePairing']:
-                sim = Recipes(
-                    api_id=n['id'],
-                    title=n['title'],
-                    image=n['image'],
-                    serves=n['servings'],
-                    time=n['readyInMinutes'],
-                    source_url=n['sourceUrl'],
-                    credit=n['creditsText'],
-                    health_score=n['healthScore'],
-                    popularity=n['aggregateLikes'],
-                    wine_pairing=n['winePairing']['pairingText']
-                )
-            else:
-                sim = Recipes(
-                    api_id=n['id'],
-                    title=n['title'],
-                    image=n['image'],
-                    serves=n['servings'],
-                    time=n['readyInMinutes'],
-                    source_url=n['sourceUrl'],
-                    credit=n['creditsText'],
-                    health_score=n['healthScore'],
-                    popularity=n['aggregateLikes'],
-                    wine_pairing="None"
+            try:
+                wine = n['winePairing']['pairingText']
+            except KeyError:
+                wine = "None"
+            try:
+                i = n['image']
+            except KeyError:
+                i = '/static/img/core-img/salad.png'
+            sim = Recipes(
+                api_id=n['id'],
+                title=n['title'],
+                image=i,
+                serves=n['servings'],
+                time=n['readyInMinutes'],
+                source_url=n['sourceUrl'],
+                credit=n['creditsText'],
+                health_score=n['healthScore'],
+                popularity=n['aggregateLikes'],
+                wine_pairing=wine
                 )
             sim.save()
             for j in n['extendedIngredients']:
