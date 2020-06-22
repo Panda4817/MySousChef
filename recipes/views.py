@@ -37,18 +37,28 @@ def dashboard(request):
     recipes = list(UserToRecipe.objects.filter(user=request.user).order_by('-added')[:5])
     data = {}
     pantry_items = list(UserToPantry.objects.filter(user=request.user))
+    names = []
+    results = []
     if len(pantry_items) == 0:
         data = {'message': "No items in MyPantry to search with. Add ingredients to MyPantry.", 'recipes': None}
-    names = [] 
-    for i in pantry_items:
-        names.append(i.pantry_item.name)
-    results = api_client.search_recipes_ingredients(names)
-    if len(results) == 0:
+    else:
+        for i in pantry_items:
+            names.append(i.pantry_item.name)
+        results = api_client.search_recipes_ingredients(names)
+    if settings.DEBUG == True:
+        print(results)
+    if results != None:
+        if results == [] or len(results) == 0:
+            data = {
+                'message': "No results. Add more items to MyPantry.",
+                'recipes': None
+            }
+        else:
+            data = prepare_simple_results(results)
+    else:
         data = {
-            'message': "No results. Add more items to MyPantry.",
-            'recipes': None
-        }
-    data = prepare_simple_results(results)
+                'message': "API ERROR. Check back tomorrow. Sorry :("
+            }
     context = {
         'items': items,
         'names': shopping,
@@ -367,16 +377,23 @@ def search_simple(request):
         names = [] 
         for i in pantry_items:
             names.append(i.pantry_item.name)
-        
+        results = []
         results = api_client.search_recipes_ingredients(names)
-        
-        if len(results) == 0:
+        if results != None:
+            if results == [] or len(results) == 0:
+                data = {
+                    'message': "No results. Add more items to MyPantry."
+                }
+                response = JsonResponse(data)
+                response.status_code = 400
+                return response
+        else:
             data = {
-                'message': "No results. Add more items to MyPantry."
-            }
+                    'message': "API ERROR. Check back tomorrow. Sorry :("
+                }
             response = JsonResponse(data)
-            response.status_code = 400
-            return response
+            response.status_code = 500
+            return response  
         
         data = prepare_simple_results(results)
         cache.clear()
@@ -503,7 +520,9 @@ def recipe(request, recipe_id):
             cache.clear()
     steps = list(RecipeInstructions.objects.filter(recipe_id=recipe).order_by('step'))
     others = api_client.get_recipes_similar(recipe_id)
-    similar = get_similar_recipes(others)
+    similar = []
+    if others != None:
+        similar = get_similar_recipes(others)
     context = {
         'recipe': recipe,
         'ingredients': ingredients,
@@ -673,12 +692,16 @@ def extra_ingredient_info(request):
         else:
             imperial = convertunit(name, unit, amount)
         results = api_client.get_substitute_name(name)
-        if results['status'] == "failure":
-            subs = "No substitutes found"
+        if results != None:
+            if results['status'] == "failure":
+                subs = "No substitutes found"
+            else:
+                subs = ', '.join(results['substitutes'])  
         else:
-            subs = ', '.join(results['substitutes'])  
+            subs = "API ERROR. Check tomorrow. Sorry :("
+        
         if imperial == None:
-            imperial = "No unit conversion available"        
+            imperial = "No unit conversion available"
         data = {
             'subs': subs,
             'imperial': imperial,

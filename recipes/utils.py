@@ -39,7 +39,7 @@ class RecipeClient(object):
 
     # Search recipes using ingredients
     def search_recipes_ingredients(self, ingredients):
-        filters = {'ingredients': ','.join(ingredients), 'number': 5, 'limitLicense': True, 'ranking': 2, 'ignorePantry': False}
+        filters = {'ingredients': ','.join(ingredients), 'number': 5, 'limitLicense': 'false', 'ranking': 2, 'ignorePantry': 'false'}
         response = self._get('/recipes/findByIngredients', filters)
         return response
     
@@ -104,7 +104,7 @@ class RecipeClient(object):
             })
         filters.update({
             'number': 5,
-            'limitLicense': True
+            'limitLicense': 'false'
         })
         response = self._get('/recipes/complexSearch', filters)
         return response
@@ -197,7 +197,7 @@ def addToPantry(ingredientName, user, intolerance):
                     'item': relate,
                 })
                 return data
-    message = "ERROR: Pantry item could not be found"
+    message = "ERROR: Pantry item could not be found or API error. Sorry :("
     data.update({
         'message': message,
     })
@@ -367,6 +367,11 @@ def prepare_simple_results(results):
 
 # Searching recipes using complex method, adds them to database
 def prepare_advance_results(results):
+    if results == None:
+        data = {'message': "API ERROR. Check back tomorrow. Sorry :("}
+        response = JsonResponse(data)
+        response.status_code = 500
+        return response 
     if len(results['results']) == 0:
         data = {'message': "No results. Try just searching without MyPantry items instead"}
         response = JsonResponse(data)
@@ -487,7 +492,10 @@ def convertunit(name, unit, amount):
                 result = api_client.convert(name, amount, unit, "pints")
             else:
                 result = api_client.convert(name, amount, unit, "cup")
-    return result['answer']
+    if result != None:
+        return result['answer']
+    else:
+        return "API ERROR"
 
 # get similar recipes to id given, adds results to database        
 def get_similar_recipes(others):
@@ -499,7 +507,8 @@ def get_similar_recipes(others):
             sim = Recipes.objects.get(api_id=other['id'])
         except Recipes.DoesNotExist:
             n = api_client.get_recipe_info(other['id'])
-            pprint.pprint(n)
+            if settings.DEBUG == 'True':
+                pprint.pprint(n)
             try:
                 wine = n['winePairing']['pairingText']
             except KeyError:
