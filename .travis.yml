@@ -1,6 +1,10 @@
 language: python
 python: 3.8
-install: pip install -r requirements.txt
+install:
+    - apt-get install postgresql-12 
+    - pip install -r requirements.txt
+before script:
+    - service postgresql start
 script: python manage.py test
 deploy:
     provider: heroku
