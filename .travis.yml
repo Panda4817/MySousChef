@@ -1,7 +1,7 @@
 language: python
 python: 3.8
 install:
-    - apt-get install postgresql-12 
+    - sudo apt-get install postgresql-12 
     - pip install -r requirements.txt
 before script:
     - service postgresql start
