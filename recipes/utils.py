@@ -22,7 +22,8 @@ class RecipeClient(object):
         filters.update({'apiKey': self.key})
         filter_str = urlencode(filters)
         try:
-            print('https://{}{}?{}'.format(self.host, path, filter_str))
+            if settings.DEBUG == 'True':
+                print('https://{}{}?{}'.format(self.host, path, filter_str))
             response = self.session.get('https://{}{}?{}'.format(self.host, path, filter_str))
             response.raise_for_status()
         except requests.RequestException:
@@ -95,7 +96,7 @@ class RecipeClient(object):
                 'sortDirection': sortDirection,
             })
         filters.update({
-            'number': 2,
+            'number': 10,
             'limitLicense': False
         })
         response = self._get('/recipes/complexSearch', filters)
@@ -223,32 +224,26 @@ def prepare_simple_results(results):
             api_client = RecipeClient()
             results2 = api_client.get_recipe_bulk(not_found)
             for i in results2:
-                if i['winePairing']:
-                    item = Recipes(
-                        api_id=i['id'],
-                        title=i['title'],
-                        image=i['image'],
-                        serves=i['servings'],
-                        time=i['readyInMinutes'],
-                        source_url=i['sourceUrl'],
-                        credit=i['creditsText'],
-                        health_score=i['healthScore'],
-                        popularity=i['aggregateLikes'],
-                        wine_pairing=i['winePairing']['pairingText']
-                    )
-                else:
-                    item = Recipes(
-                        api_id=i['id'],
-                        title=i['title'],
-                        image=i['image'],
-                        serves=i['servings'],
-                        time=i['readyInMinutes'],
-                        source_url=i['sourceUrl'],
-                        credit=i['creditsText'],
-                        health_score=i['healthScore'],
-                        popularity=i['aggregateLikes'],
-                        wine_pairing="None"
-                    )
+                try:
+                    wine = i['winePairing']['pairingText']
+                except KeyError:
+                    wine = "None"
+                try:
+                    img = i['image']
+                except KeyError:
+                    img = '/static/img/core-img/salad.png'
+                item = Recipes(
+                    api_id=i['id'],
+                    title=i['title'],
+                    image=img,
+                    serves=i['servings'],
+                    time=i['readyInMinutes'],
+                    source_url=i['sourceUrl'],
+                    credit=i['creditsText'],
+                    health_score=i['healthScore'],
+                    popularity=i['aggregateLikes'],
+                    wine_pairing=wine
+                )
                 item.save()
                 found.append({
                     'id': item.api_id,
@@ -304,32 +299,26 @@ def prepare_simple_results(results):
     if len(not_found) > 0:
         results2 = api_client.get_recipe_bulk(not_found)
         for i in results2:
-            if i['winePairing']:
-                item = Recipes(
-                    api_id=i['id'],
-                    title=i['title'],
-                    image=i['image'],
-                    serves=i['servings'],
-                    time=i['readyInMinutes'],
-                    source_url=i['sourceUrl'],
-                    credit=i['creditsText'],
-                    health_score=i['healthScore'],
-                    popularity=i['aggregateLikes'],
-                    wine_pairing=i['winePairing']['pairingText']
-                )
-            else:
-                item = Recipes(
-                    api_id=i['id'],
-                    title=i['title'],
-                    image=i['image'],
-                    serves=i['servings'],
-                    time=i['readyInMinutes'],
-                    source_url=i['sourceUrl'],
-                    credit=i['creditsText'],
-                    health_score=i['healthScore'],
-                    popularity=i['aggregateLikes'],
-                    wine_pairing="None"
-                )
+            try:
+                wine = i['winePairing']['pairingText']
+            except KeyError:
+                wine = "None"
+            try:
+                img = i['image']
+            except KeyError:
+                img = '/static/img/core-img/salad.png'
+            item = Recipes(
+                api_id=i['id'],
+                title=i['title'],
+                image=img,
+                serves=i['servings'],
+                time=i['readyInMinutes'],
+                source_url=i['sourceUrl'],
+                credit=i['creditsText'],
+                health_score=i['healthScore'],
+                popularity=i['aggregateLikes'],
+                wine_pairing=wine
+            )
             item.save()
             found.append({
                     'id': item.api_id,
@@ -390,32 +379,26 @@ def prepare_advance_results(results):
                 })
                 check_found = True
         if check_found == False:
-            if i['winePairing']:
-                item = Recipes(
-                    api_id=i['id'],
-                    title=i['title'],
-                    image=i['image'],
-                    serves=i['servings'],
-                    time=i['readyInMinutes'],
-                    source_url=i['sourceUrl'],
-                    credit=i['creditsText'],
-                    health_score=i['healthScore'],
-                    popularity=i['aggregateLikes'],
-                    wine_pairing=i['winePairing']['pairingText']
-                )
-            else:
-                item = Recipes(
-                    api_id=i['id'],
-                    title=i['title'],
-                    image=i['image'],
-                    serves=i['servings'],
-                    time=i['readyInMinutes'],
-                    source_url=i['sourceUrl'],
-                    credit=i['creditsText'],
-                    health_score=i['healthScore'],
-                    popularity=i['aggregateLikes'],
-                    wine_pairing="None"
-                )
+            try:
+                wine = i['winePairing']['pairingText']
+            except KeyError:
+                wine = "None"
+            try:
+                img = i['image']
+            except KeyError:
+                img = '/static/img/core-img/salad.png'
+            item = Recipes(
+                api_id=i['id'],
+                title=i['title'],
+                image=img,
+                serves=i['servings'],
+                time=i['readyInMinutes'],
+                source_url=i['sourceUrl'],
+                credit=i['creditsText'],
+                health_score=i['healthScore'],
+                popularity=i['aggregateLikes'],
+                wine_pairing=wine
+            )
             item.save()
             found.append({
                 'id': item.api_id,

@@ -61,14 +61,16 @@ def search_ingredients(request):
         # Get data from form
         searchInput = request.POST['search_input']
         intolerance = request.POST.getlist('intolerance[]')
-        print(intolerance)
+        if settings.DEBUG == 'True':
+            print(intolerance)
         # Check what the intolerance selection is
         boolintolerance = check_list(intolerance)
         if boolintolerance == False:
             intolerance = None
         
         results = api_client.get_ingredients(searchInput, intolerance)
-        print(results)
+        if settings.DEBUG == 'True':
+            print(results)
         # Prepare data to send back to ajax
         ingredient_list = []
         input_correct = False
@@ -99,9 +101,11 @@ def pantry(request):
     user = User.objects.get(pk=request.user.id) 
     if request.method == 'POST':
         ingredientName = request.POST['ingredientName']
-        print(ingredientName)
+        if settings.DEBUG == 'True':
+            print(ingredientName)
         intolerance = request.POST.getlist('intolerance[]')
-        print(intolerance)
+        if settings.DEBUG == 'True':
+            print(intolerance)
         
         # Check what the intolerance selection is
         boolintolerance = check_list(intolerance)
@@ -180,12 +184,15 @@ def change_useby(request):
 
         
         date = (parser.isoparse(usedate))
-        print(date)
+        if settings.DEBUG == 'True':
+            print(date)
         inputdate = datetime.date(date)
-        print(inputdate)
+        if settings.DEBUG == 'True':
+            print(inputdate)
         today = timezone.now()
         todaydate = datetime.date(today)
-        print(todaydate)
+        if settings.DEBUG == 'True':
+            print(todaydate)
         if inputdate < todaydate:
             data = {
                 'id': usertopantry_id,
@@ -220,12 +227,15 @@ def change_open(request):
 
         
         date = (parser.isoparse(opendate))
-        print(date)
+        if settings.DEBUG == 'True':
+            print(date)
         inputdate = datetime.date(date)
-        print(inputdate)
+        if settings.DEBUG == 'True':
+            print(inputdate)
         today = timezone.now()
         todaydate = datetime.date(today)
-        print(todaydate)
+        if settings.DEBUG == 'True':
+            print(todaydate)
         if inputdate < todaydate:
             data = {
                 'id': usertopantry_id,
@@ -234,7 +244,8 @@ def change_open(request):
             response = JsonResponse(data)
             response.status_code = 400
             return response
-        print(date)
+        if settings.DEBUG == 'True':
+            print(date)
         
         item = UserToPantry.objects.get(pk=usertopantry_id)
         item.opened = date
@@ -257,12 +268,15 @@ def change_frozen(request):
 
         
         date = (parser.isoparse(frozendate))
-        print(date)
+        if settings.DEBUG == 'True':
+            print(date)
         inputdate = datetime.date(date)
-        print(inputdate)
+        if settings.DEBUG == 'True':
+            print(inputdate)
         today = timezone.now()
         todaydate = datetime.date(today)
-        print(todaydate)
+        if settings.DEBUG == 'True':
+            print(todaydate)
         if inputdate < todaydate:
             data = {
                 'id': usertopantry_id,
@@ -271,7 +285,8 @@ def change_frozen(request):
             response = JsonResponse(data)
             response.status_code = 400
             return response
-        print(date)
+        if settings.DEBUG == 'True':
+            print(date)
         
         item = UserToPantry.objects.get(pk=usertopantry_id)
         item.frozen = date
@@ -663,7 +678,8 @@ def delete_liked(request):
             item.delete()
             cache.clear()
         else:
-            print("error")
+            if settings.DEBUG == 'True':
+                print("error")
         data = {
             'id': recipe_id
         }
@@ -682,6 +698,7 @@ def delete_myrecipe(request):
         item.delete()
         cache.clear()
     else:
-        print("error")
+        if settings.DEBUG == 'True':
+            print("error")
     messages.info(request, "Recipe deleted")
     return redirect('recipes:myrecipe')
