@@ -1,5 +1,8 @@
+
+//Javascript template to display search results
 const template = Handlebars.compile(document.querySelector('#result_template').innerHTML);
 
+// Update dom with results
 function updateresults(data) {
     let x = document.querySelector('#results').querySelectorAll('div');
     for (var i=0; i<x.length; i++){
@@ -26,6 +29,7 @@ function updateresults(data) {
     }   
 }
 
+// Check any input fields that are required are filled out correctly
 function checkInput() {
     'use strict';
     document.getElementById('advancedbtn').disabled = true;
@@ -41,6 +45,7 @@ function checkInput() {
     }
 }
 
+// Ajax call for simple recipe search using ingredient in pantry only
 function simplesearch() {
     $.ajax({
         type: "POST",
@@ -76,6 +81,7 @@ function simplesearch() {
     })
 }
 
+// Ajax call for advanced search
 function advancedsearch() {
     query = document.getElementById('queryInput').value;
     let a = document.querySelector('select[name="intolerance"]').selectedOptions;
@@ -146,6 +152,8 @@ function advancedsearch() {
         return;
     })
 }
+
+// When dom loaded fully, localstorage set up to store results so when back button pressed after viewing a recipe, results are reloaded from storage
 document.addEventListener('DOMContentLoaded', () => {
     if (window.location.hash != "#results"){
         localStorage.clear();

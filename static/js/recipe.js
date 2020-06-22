@@ -1,5 +1,4 @@
-
-
+// Function to add recipe to liked list using ajax call
 function addtoliked(data) {
     $.ajax({
         type: "POST",
@@ -29,6 +28,7 @@ function addtoliked(data) {
     })
 }
 
+// Function used to dynamically generate form from formset
 function updateElementIndex(el, prefix, ndx) {
     var id_regex = new RegExp('(' + prefix + '-\\d+)');
     var replacement = prefix + '-' + ndx;
@@ -37,6 +37,7 @@ function updateElementIndex(el, prefix, ndx) {
     if (el.name) el.name = el.name.replace(id_regex, replacement);
 }
 
+// Function used to dynamically generate form from formset
 function cloneMore(selector, prefix, name) {
     var newElement = $(selector).clone(true);
     var total = $('#id_' + prefix + '-TOTAL_FORMS').val();
@@ -63,6 +64,7 @@ function cloneMore(selector, prefix, name) {
     return false;
 }
 
+// Function used to dynamically generate form from formset
 function deleteForm(prefix, btn, name) {
     var total = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
     if (total > 1){
@@ -78,6 +80,7 @@ function deleteForm(prefix, btn, name) {
     return false;
 }
 
+// Check text input fields are filled in correctly
 function checktext(data) {
     'use strict';
     let inputvalue = document.getElementById(data).value;
@@ -90,6 +93,7 @@ function checktext(data) {
     }
 }
 
+// Check number input fields are filled in correctly
 function checknumber(data) {
     'use strict';
     let inputvalue = document.getElementById(data).value;
@@ -101,11 +105,14 @@ function checknumber(data) {
         document.getElementById(data).classList.remove('is-invalid');
     }
 }
+
+// When close cliked when extra info on ingredients is open on recipe page
 function closeinfo(data) {
     let div = document.getElementById('extra'+data);
     div.style.display = "none";
 }
 
+// Ajax call to display extra info about ingredients on recipe page
 function extrainfo(data) {
     let name = document.getElementById('name'+data).innerText;
     let amount = document.getElementById('amount'+data).innerText;
@@ -141,6 +148,7 @@ function extrainfo(data) {
     });
 }
 
+// Ajax call delete liked recipes
 function deleteliked(data) {
     $.ajax({
         type: "POST",
@@ -157,6 +165,8 @@ function deleteliked(data) {
     });
 }
 
+
+// When dom loads fully, click events are put in place for dynamically generated forms
 document.addEventListener('DOMContentLoaded', () => {
     $(document).on('click', '.add-ingform-row', function(e){
         e.preventDefault();

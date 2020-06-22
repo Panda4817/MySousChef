@@ -1,6 +1,9 @@
+// Javascript template for displaying items in shopping list
 const template = Handlebars.compile(document.querySelector('#list_template').innerHTML);
+// delete button disabled until items in list are checked
 document.getElementById('deletebtn').disabled = true;
 
+// Check field correctly filled out
 function checklistinput() {
     'use strict';
     document.getElementById('listaddbtn').disabled = true;
@@ -16,6 +19,7 @@ function checklistinput() {
     }
 }
 
+// Update dom using javascript template
 function updatelist(data) {
     let none = document.getElementById('none');
     if (none != null)
@@ -27,6 +31,7 @@ function updatelist(data) {
     document.querySelector('#list').innerHTML += content;
 }
 
+// Ajax call to add to shopping list
 function addToList() {
     let a = document.getElementById('listinput').value;
     $.ajax({
@@ -58,6 +63,7 @@ function addToList() {
     })
 }
 
+// Function to check items are checked
 function check() {
     document.getElementById('deletebtn').disabled = true;
     let b = document.getElementsByName('listitem[]');
@@ -68,6 +74,7 @@ function check() {
 
 }
 
+// Function that updates dom when items are deleted
 function deletechecked(data) {
     document.getElementById('deletebtn').disabled = true;
     var len = data.ids.length
@@ -83,7 +90,7 @@ function deletechecked(data) {
 
 }
 
-
+// Ajax call to delete items off shopping list
 function deleteList() {
     let d =[];
     let c =  document.getElementsByName('listitem[]');

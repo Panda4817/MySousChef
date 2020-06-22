@@ -1,3 +1,4 @@
+//Convert any isostrings to local date client-side
 function convertLocalDate() {
     var dates = document.getElementsByClassName('date');
     var open_dates = document.getElementsByClassName('date-open');
@@ -42,6 +43,7 @@ function convertLocalDate() {
     return; 
 }
 
+//Determine type of greeting depending on time of day
 function greeting() {
     let now_time = new Date();
     if (now_time.getHours() < 12)

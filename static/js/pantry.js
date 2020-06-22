@@ -1,4 +1,7 @@
+//Disable buttons to forms until fields are validated
 document.querySelector('#pantryadd').setAttribute("disabled", "disabled");
+
+//Prevent high number of ajax calls
 var timeout = null;
 
 // General function to titleCase string
@@ -9,7 +12,7 @@ function titleCase(str) {
     }
     return str.join(' ');
 }
-
+//Convert any isostrings to local time for client
 function convertLocalDate() {
     var dates = document.getElementsByClassName('date');
     var i;
@@ -61,6 +64,7 @@ function convertLocalTime() {
     return;
 }
 
+//Ajax call to search ingredient and produce list of autocomplete
 function searchingredients() {
     document.querySelector('#pantryadd').setAttribute("disabled", "disabled");
     document.querySelector('#searchinput').classList.add('is-invalid');
@@ -128,6 +132,7 @@ function searchingredients() {
 
 }
 
+//When dom loads fully, all dates and times convereted to local and date input fields have restrictions on them
 document.addEventListener('DOMContentLoaded', () => {
     convertLocalTime();
     let dateInputs = document.getElementsByClassName('inputdate');
@@ -137,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
     convertLocalDate();
 });
 
+//When new item added, dom is updated
 function  updatedompantry(data) {
     const template = Handlebars.compile(document.querySelector('#modal_template').innerHTML);
     let div  = document.createElement('div');
@@ -255,6 +261,7 @@ function  updatedompantry(data) {
     return;
 }
 
+//Ajax call to add to pantry
 function addtopantry() {
     document.getElementById('searcherror').style.display = "none";
     let a = document.querySelector('select[name="intolerance"]').selectedOptions;
@@ -296,6 +303,7 @@ function addtopantry() {
     })
 }
 
+// Check quantity input field is correct
 function checkqty(data) {
     'use strict';
     let inputvalue = document.getElementById('inputqty'+data).value;
@@ -309,6 +317,8 @@ function checkqty(data) {
         document.getElementById('qtyerror'+data).style.display = "none";
     }
 }
+
+//Check use within is filled out 
 function checkuw(data) {
     'use strict';
     let inputvalue = document.getElementById('inputuw'+data).value;
@@ -321,6 +331,7 @@ function checkuw(data) {
     }
 }
 
+// Check date inputs are correctly inputed
 function checkdate(data, name) {
     'use strict';
     let inputvalue = document.getElementById('input'+name+data).value;
@@ -335,7 +346,7 @@ function checkdate(data, name) {
     }
 }
 
-
+// Ajax call to change qty
 function changeqty(data) {
     let newqty = document.getElementById('inputqty'+data).value;
     $.ajax({
@@ -362,6 +373,7 @@ function changeqty(data) {
     })
 }
 
+// Work out difference between 2 dates using moment.js
 function diffDate(startDate, endDate) {
     var b = moment(startDate),
       a = moment(endDate),
@@ -377,6 +389,7 @@ function diffDate(startDate, endDate) {
     return out;
   }
   
+  // Ussing the difference display the information in days, weeks, months and years
   function display(obj) {
     var str = '';
     for (key in obj) {
@@ -390,7 +403,7 @@ function diffDate(startDate, endDate) {
   }
 
 
-
+// Update dom with difference between days ie 5 days until use-by date
 function addMonthDay(data) {
     let today = new Date();
     let usedate = document.getElementById('useref'+data);
@@ -417,6 +430,7 @@ function addMonthDay(data) {
     
 }
 
+// Add a top section to modal if not there before
 function addtopsection(data, name) {
     let sectionrow = document.getElementById(name+'section'+data.id);
     if (sectionrow != null) {
@@ -456,6 +470,7 @@ function addtopsection(data, name) {
     }
 }
 
+// Ajax call to change use by date
 function changeuseby(data) {
     let usetext = $("input[name='radiotext"+data+"']:checked").val();
     let usedate = document.getElementById('inputuse'+data).value;
@@ -492,6 +507,7 @@ function changeuseby(data) {
     })
 }
 
+// Ajax call to change when opened date
 function changeopen(data) {
     let usedate = document.getElementById('inputopen'+data).value;
     let t = "12:00:00.000Z"
@@ -524,6 +540,7 @@ function changeopen(data) {
     })
 }
 
+// Ajax call to change when frozen date
 function changefrozen(data) {
     let usedate = document.getElementById('inputfrozen'+data).value;
     let t = "12:00:00.000Z"
@@ -556,6 +573,7 @@ function changefrozen(data) {
     })
 }
 
+// Ajax call to add use within information
 function changeuw(data) {
     let uw = document.getElementById('inputuw'+data).value;
 
@@ -574,6 +592,7 @@ function changeuw(data) {
     });
 }
 
+// Ajax call to delete an item
 function deleteitem(data) {
     $.ajax({
         type: "POST",
@@ -590,6 +609,7 @@ function deleteitem(data) {
     });
 }
 
+// Ajax call to add an item to shopping list
 function shoppingitem(data) {
     $.ajax({
         type: "POST",
