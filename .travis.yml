@@ -4,7 +4,7 @@ install:
     - sudo apt-get install postgresql-12 
     - pip install -r requirements.txt
 before script:
-    - service postgresql start
+    - sudo service postgresql start
 script: python manage.py test
 deploy:
     provider: heroku
