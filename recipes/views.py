@@ -14,6 +14,7 @@ import pytz
 import json
 from .forms import *
 import pprint
+from django.core.cache import cache
 
 # Configure clients
 api_client = RecipeClient()
@@ -108,6 +109,7 @@ def pantry(request):
             intolerance = None
         
         data = addToPantry(ingredientName, user, intolerance)
+        cache.clear()
         if 'ERROR' in data['message']:
             response_data = {
                 'message': data['message']
@@ -160,7 +162,7 @@ def change_qty(request):
         item = UserToPantry.objects.get(pk=usertopantry_id)
         item.quantity = new_qty
         item.save()
-
+        cache.clear()
         response = {
             'id': usertopantry_id,
             'new_qty': new_qty
@@ -199,7 +201,7 @@ def change_useby(request):
         item.usebefore_text = usetext
         item.usebefore = date
         item.save()
-
+        cache.clear()
         data = {
             'id': usertopantry_id,
             'datetext': usetext,
@@ -237,7 +239,7 @@ def change_open(request):
         item = UserToPantry.objects.get(pk=usertopantry_id)
         item.opened = date
         item.save()
-
+        cache.clear()
         data = {
             'id': usertopantry_id,
             'date': opendate,
@@ -274,7 +276,7 @@ def change_frozen(request):
         item = UserToPantry.objects.get(pk=usertopantry_id)
         item.frozen = date
         item.save()
-
+        cache.clear()
         data = {
             'id': usertopantry_id,
             'date': frozendate,
@@ -293,7 +295,7 @@ def change_use_within(request):
         item = UserToPantry.objects.get(pk=usertopantry_id)
         item.use_within = uw
         item.save()
-
+        cache.clear()
         response = {
             'id': usertopantry_id,
             'uw': item.use_within,
@@ -308,7 +310,7 @@ def delete_pantry_item(request):
 
         item = UserToPantry.objects.get(pk=usertopantry_id)
         item.delete()
-
+        cache.clear()
         response = {
             'id': usertopantry_id,
         }
@@ -347,6 +349,7 @@ def search_simple(request):
             return response
         
         data = prepare_simple_results(results)
+        cache.clear()
         response = JsonResponse(data)
         response.status_code = 200
         return response
@@ -411,6 +414,7 @@ def search_advanced(request):
         
         results = api_client.search_recipes_complex(query, cuisine, diet, intolerance, names, meal_type, sort, sort_direction)
         response = prepare_advance_results(results)
+        cache.clear()
         return response
     return redirect('recipes:search_recipes')
 
@@ -438,6 +442,7 @@ def recipe(request, recipe_id):
         
         liked = UserToRecipe(user=request.user, recipe_id=recipe)
         liked.save()
+        cache.clear()
         data = {
             'message': "Added"
         }
@@ -464,6 +469,7 @@ def recipe(request, recipe_id):
                 description=i['step'],
             )
             instruction.save()
+            cache.clear()
     steps = list(RecipeInstructions.objects.filter(recipe_id=recipe).order_by('step'))
     others = api_client.get_recipes_similar(recipe_id)
     similar = get_similar_recipes(others)
@@ -492,6 +498,7 @@ def shopping_list(request):
                 return response
         itemsave = ShoppingList(user=request.user, name=pantryitem.pantry_item.name.title())
         itemsave.save()
+        cache.clear()
         data = {
             'id': pantry_id
         }
@@ -528,6 +535,7 @@ def add_list(request):
                 return response
         item = ShoppingList(user=request.user, name=name.title())
         item.save()
+        cache.clear()
         data = {
             'id': item.id,
             'name': item.name
@@ -555,6 +563,7 @@ def delete_list(request):
                 ids.append(item.id)
                 itemtod = ShoppingList.objects.get(pk=item.id)
                 itemtod.delete()
+        cache.clear()
         response = JsonResponse({'ids': ids})
         response.status_code = 200
         return response
@@ -584,6 +593,7 @@ def myrecipe(request):
                 instruction.save()
             usertomyrecipe = UserToMyRecipe(user=request.user, recipe_id=recipe)
             usertomyrecipe.save()
+            cache.clear()
             messages.success(request, "Recipe added!")
             return redirect('recipes:myrecipe')
         
@@ -651,6 +661,7 @@ def delete_liked(request):
         if len(items) == 1:
             item = UserToRecipe.objects.get(pk=items[0].id)
             item.delete()
+            cache.clear()
         else:
             print("error")
         data = {
@@ -669,6 +680,7 @@ def delete_myrecipe(request):
     if len(items) == 1:
         item = UserToMyRecipe.objects.get(pk=items[0].id)
         item.delete()
+        cache.clear()
     else:
         print("error")
     messages.info(request, "Recipe deleted")

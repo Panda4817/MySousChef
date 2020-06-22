@@ -943,18 +943,23 @@ textarea:focus {
   background-attachment: fixed;
 }
 @media only screen and (min-width:992px) and (max-width:1199px) {
-  .cta-area {
+  .cta-area.search {
     height: 125vh;
   }
 }
 @media only screen and (min-width:768px) and (max-width:991px) {
-  .cta-area {
+  .cta-area.search {
     height: 135vh;
   }
 }
 @media only screen and (max-width:767px) {
-  .cta-area {
+  .cta-area.search {
     height: 150vh;
+  }
+}
+@media (hover: none) {
+  .cta-area {
+    background-attachment: initial;
   }
 }
 .cta-area .cta-content h2 {

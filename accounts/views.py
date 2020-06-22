@@ -32,6 +32,7 @@ from django.core.mail import send_mail
 from .signals import show_login_message, show_logout_message
 from .forms import SignUpForm, ContactForm, ChangeUsernameForm, ChangeEmailForm
 from .tokens import account_activation_token
+from django.core.cache import cache
 
 
 UserModel = get_user_model()
@@ -50,6 +51,7 @@ def register(request):
             user = form.save(commit=False)
             user.is_active = False
             user.save()
+            cache.clear()
             current_site = get_current_site(request)
             subject = 'Activate Your MySousChef Account'
             message = render_to_string('registration/account_activation_email.html', {
@@ -79,6 +81,7 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.profile.email_confirmed = True
         user.save()
+        cache.clear()
         login(request, user)
         messages.info(
             request, f"Hello { user.username }! Welcome to MySousChef")
@@ -239,6 +242,7 @@ def update_username(request):
             user = User.objects.get(pk = request.user.id)
             user.username = form.cleaned_data['username']
             user.save()
+            cache.clear()
             messages.success(request, "Username changed successfully!")
         return redirect('accounts:account')
     
@@ -253,6 +257,7 @@ def update_email(request):
             user.email = form.cleaned_data['email']
             user.profile.email_confirmed = False
             user.save()
+            cache.clear()
             current_site = get_current_site(request)
             subject = 'Email Changed - Activate Your MySousChef Account again'
             message = render_to_string('registration/account_activation_email.html', {
