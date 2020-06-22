@@ -2,6 +2,7 @@ from django import forms
 from django.forms import modelformset_factory
 from .models import *
 
+# Form for gathering recipe information when creating own recipe
 class MyRecipeInfoForm(forms.ModelForm):
     title = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
@@ -41,6 +42,7 @@ class MyRecipeInfoForm(forms.ModelForm):
             'image'
         )
 
+# Form for adding ingredient information for own recipe
 class IngredientsForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
@@ -69,12 +71,13 @@ class IngredientsForm(forms.ModelForm):
         'unit',
         'meta'
     )
-
+# Formset for ingredient forms
 IngredientsFormset = modelformset_factory(
     MyRecipeIngredients, 
     form=IngredientsForm, 
     extra=1)
 
+# Form for gathering instrcutions for own recipe
 class InstructionsForm(forms.ModelForm):
     step = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control',
@@ -95,8 +98,10 @@ class InstructionsForm(forms.ModelForm):
             'number',
             'step'
         )
-
+# Formset for instruction forms
 InstructionsFormset = modelformset_factory(
     MyRecipeInstructions, 
     form=InstructionsForm, 
     extra=1)
+
+# formsets used to dynamically generate forms

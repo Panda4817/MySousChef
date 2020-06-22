@@ -38,12 +38,14 @@ from django.core.cache import cache
 UserModel = get_user_model()
 
 # Create your views here.
+# index page for when not logged in
 def index(request):
     if request.user.is_authenticated:
         return redirect('recipes:dashboard')
     else:
         return render(request, 'registration/index.html')
 
+# register page
 def register(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -223,7 +225,7 @@ def password_reset_complete(request):
     messages.info(request, "Your password has been reset.")
     return redirect('accounts:login')
 
-
+# Account page when logged in
 @login_required(login_url=reverse_lazy("accounts:login"))
 def account(request):
     uform = ChangeUsernameForm()
@@ -234,6 +236,7 @@ def account(request):
     }
     return render(request, 'registration/account.html', context)
 
+# view to process update username form
 @login_required(login_url=reverse_lazy("accounts:login"))
 def update_username(request):
     if request.method == 'POST':
@@ -248,6 +251,7 @@ def update_username(request):
     
     return redirect('accounts:account')
 
+# view to process update email form
 @login_required(login_url=reverse_lazy("accounts:login"))
 def update_email(request):
     if request.method == 'POST':
@@ -305,7 +309,7 @@ def password_change_done(request):
     messages.info(request, "Your password has been updated.")
     return redirect('accounts:account')
 
-
+# view to process contact form
 def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)

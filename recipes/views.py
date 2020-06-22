@@ -20,8 +20,11 @@ from django.core.cache import cache
 api_client = RecipeClient()
 
 # Create your views here.
+
+# Dashboard
 @login_required(login_url=reverse_lazy("accounts:login"))
 def dashboard(request):
+    # Get personalised data from database
     items = list(UserToPantry.objects.filter(user=request.user).exclude(frozen__isnull=False).order_by('usebefore')[:5])
     for item in items:
         if item.usebefore != None:
@@ -55,6 +58,7 @@ def dashboard(request):
     }
     return render(request, 'recipes/dashboard.html', context)
 
+# Searching ingredients
 @login_required(login_url=reverse_lazy("accounts:login"))
 def search_ingredients(request):
     if request.method == 'POST':
@@ -100,6 +104,7 @@ def search_ingredients(request):
 def pantry(request):
     user = User.objects.get(pk=request.user.id) 
     if request.method == 'POST':
+        # Get data from form
         ingredientName = request.POST['ingredientName']
         if settings.DEBUG == 'True':
             print(ingredientName)
@@ -112,6 +117,7 @@ def pantry(request):
         if boolintolerance == False:
             intolerance = None
         
+        # Add item to pantry table in database
         data = addToPantry(ingredientName, user, intolerance)
         cache.clear()
         if 'ERROR' in data['message']:
@@ -122,6 +128,7 @@ def pantry(request):
             response.status_code = 404
             return response
         else:
+            # Prepare data to send back to AJAX call
             added = (data['item'].added).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
             new_aisle = data['item'].pantry_item.aisle
             if ';' in data['item'].pantry_item.aisle:
@@ -141,6 +148,7 @@ def pantry(request):
             return response   
         return redirect('recipes:pantry')
     
+    # If request is GET
     items = list(UserToPantry.objects.filter(user=user))
     context = {
         'items': items,
@@ -148,6 +156,7 @@ def pantry(request):
 
     return render(request, 'recipes/pantry.html', context)
 
+# view for url to change quanity of pantry item
 @login_required(login_url=reverse_lazy("accounts:login"))
 def change_qty(request):
     if request.method == 'POST':
@@ -174,7 +183,7 @@ def change_qty(request):
         return JsonResponse(response)
     return redirect('recipes:pantry')
 
-
+# view for url for changing use-by/best-before date
 @login_required(login_url=reverse_lazy("accounts:login"))
 def change_useby(request):
     if request.method == 'POST':
@@ -219,6 +228,7 @@ def change_useby(request):
         return response
     return redirect('recipes:pantry')
 
+# view for url for changing when opened date
 @login_required(login_url=reverse_lazy("accounts:login"))
 def change_open(request):
     if request.method == 'POST':
@@ -260,6 +270,7 @@ def change_open(request):
         return response
     return redirect('recipes:pantry')
 
+# view for url for changing when frozen date
 @login_required(login_url=reverse_lazy("accounts:login"))
 def change_frozen(request):
     if request.method == 'POST':
@@ -301,6 +312,7 @@ def change_frozen(request):
         return response
     return redirect('recipes:pantry')
 
+# view for url for changing use within information
 @login_required(login_url=reverse_lazy("accounts:login"))
 def change_use_within(request):
     if request.method == 'POST':
@@ -318,6 +330,7 @@ def change_use_within(request):
         return JsonResponse(response) 
     return redirect('recipes:pantry')
 
+# view for url for deleting pantry item
 @login_required(login_url=reverse_lazy("accounts:login"))
 def delete_pantry_item(request):
     if request.method == 'POST':
@@ -332,10 +345,12 @@ def delete_pantry_item(request):
         return JsonResponse(response) 
     return redirect('recipes:pantry')
 
+# view for displaying search recipes page
 @login_required(login_url=reverse_lazy("accounts:login"))
 def search_recipes(request):
     return render(request, 'recipes/search.html')
 
+# view for url for making a simple search request using just ingredients in pantry
 @login_required(login_url=reverse_lazy("accounts:login"))
 def search_simple(request):
     if request.method =='POST':
@@ -370,7 +385,7 @@ def search_simple(request):
         return response
     return redirect('recipes:search_recipes')
 
-
+# view for url for searching recipes using complex method
 @login_required(login_url=reverse_lazy("accounts:login"))
 def search_advanced(request):
     if request.method =='POST':
@@ -433,6 +448,7 @@ def search_advanced(request):
         return response
     return redirect('recipes:search_recipes')
 
+# View to add recipes to the liked table and view recipe page from a search
 @login_required(login_url=reverse_lazy("accounts:login"))
 def recipe(request, recipe_id):
     if request.method == 'POST':
@@ -496,6 +512,7 @@ def recipe(request, recipe_id):
     }
     return render(request, 'recipes/recipe.html', context)
 
+# view shopping list page and add items to list from virtual pantry
 @login_required(login_url=reverse_lazy("accounts:login"))
 def shopping_list(request):
     if request.method == 'POST':
@@ -528,6 +545,7 @@ def shopping_list(request):
         context.update({'items': items})
     return render(request, 'recipes/shopping_list.html', context)
 
+# view to add to shopping list
 @login_required(login_url=reverse_lazy("accounts:login"))
 def add_list(request):
     if request.method == 'POST':
@@ -560,6 +578,7 @@ def add_list(request):
         return response
     return redirect('recipes:shopping_list')
 
+# View to delete item on list
 @login_required(login_url=reverse_lazy("accounts:login"))
 def delete_list(request):
     if request.method == 'POST':
@@ -584,6 +603,7 @@ def delete_list(request):
         return response
     return redirect('recipes:shopping_list')
 
+# View myrecipes page and save add to myrecipes form
 @login_required(login_url=reverse_lazy("accounts:login"))
 def myrecipe(request):
     recipeform = MyRecipeInfoForm()
@@ -621,6 +641,7 @@ def myrecipe(request):
     }
     return render(request, 'recipes/myrecipe.html', context)
 
+# View to see the recipe page for own recipes created
 @login_required(login_url=reverse_lazy("accounts:login"))
 def myrecipe_page(request, recipe_id):
     try:
@@ -637,6 +658,7 @@ def myrecipe_page(request, recipe_id):
     }
     return render(request, 'recipes/myrecipe_page.html', context)
 
+# View to make substitution and convert units requests
 @login_required(login_url=reverse_lazy("accounts:login"))
 def extra_ingredient_info(request):
     if request.method == 'POST':
@@ -667,6 +689,7 @@ def extra_ingredient_info(request):
         return response
     return redirect('recipes:myrecipe')
 
+# view to allow deleting liked recipes
 @login_required(login_url=reverse_lazy("accounts:login"))
 def delete_liked(request):
     if request.method == 'POST':
@@ -688,6 +711,7 @@ def delete_liked(request):
         return response
     return redirect('recipes:myrecipe')
 
+# view to delete a recipe created by user
 @login_required(login_url=reverse_lazy("accounts:login"))
 def delete_myrecipe(request):
     recipe_id = request.POST['recipe_id']

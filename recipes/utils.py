@@ -9,8 +9,10 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from .models import *
 import pprint
 
+# Get api key from environment variables
 api_key = os.getenv('API_KEY')
 
+# Created my own client class to make api requests
 class RecipeClient(object):
 
     def __init__(self):
@@ -18,6 +20,7 @@ class RecipeClient(object):
         self.key = api_key
         self.session = requests.session()
 
+    # add filter and create url for api request
     def _get(self, path, filters):
         filters.update({'apiKey': self.key})
         filter_str = urlencode(filters)
@@ -34,17 +37,19 @@ class RecipeClient(object):
         except (KeyError, TypeError, ValueError):
             return None
 
-
+    # Search recipes using ingredients
     def search_recipes_ingredients(self, ingredients):
-        filters = {'ingredients': ','.join(ingredients), 'number': 10, 'limitLicense': False, 'ranking': 2, 'ignorePantry': False}
+        filters = {'ingredients': ','.join(ingredients), 'number': 5, 'limitLicense': True, 'ranking': 2, 'ignorePantry': False}
         response = self._get('/recipes/findByIngredients', filters)
         return response
     
+    # Search recipe by id to get more info
     def get_recipe_info(self, recipe_id):
         filters = {'includeNutrition': 'false'}
         response = self._get('/recipes/{}/information'.format(recipe_id), filters)
         return response
     
+    # Search recipes using id in bulk
     def get_recipe_bulk(self, recipe_id_list):
         filters = {
             'ids': ','.join(recipe_id_list),
@@ -53,11 +58,13 @@ class RecipeClient(object):
         response = self._get('/recipes/informationBulk', filters)
         return response
     
+    # Search similar recipes to id given
     def get_recipes_similar(self, recipe_id):
         filters = {'number': 2}
         response = self._get('/recipes/{}/similar'.format(recipe_id), filters)
         return response
     
+    # Search recipes using query word/phrase, cuisine type etc
     def search_recipes_complex(self, query, cuisine, diet, intolerances, includeIngredients, meal_type, sort, sortDirection):
         filters = {}
         filters.update({
@@ -96,12 +103,13 @@ class RecipeClient(object):
                 'sortDirection': sortDirection,
             })
         filters.update({
-            'number': 10,
-            'limitLicense': False
+            'number': 5,
+            'limitLicense': True
         })
         response = self._get('/recipes/complexSearch', filters)
         return response
     
+    # Convert units of ingredients (using to convert from metric to imperial if suitable)
     def convert(self, ingredientName, sourceAmount, sourceUnit, targetUnit):
         filters = {
             'ingredientName': ingredientName, 
@@ -112,6 +120,7 @@ class RecipeClient(object):
         response = self._get('/recipes/convert', filters)
         return response
     
+    # Search ingredients for virtual pantry
     def get_ingredients(self, query, intolerances):
         filters = {'query': query, 'metaInformation': 'true'}
         if intolerances is not None:
@@ -119,17 +128,20 @@ class RecipeClient(object):
         response = self._get('/food/ingredients/autocomplete', filters)
         return response
     
+    # Get substitute for an ingredient
     def get_substitute_name(self, ingredientName):
         filters = {'ingredientName': ingredientName}
         response = self._get('/food/ingredients/substitutes', filters)
         return response
     
+    # Get recipe instructions to display them  for a given id
     def get_recipe_instructions(self, recipe_id):
         filters = {'stepBreakdown': True}
         response = self._get('/recipes/{}/analyzedInstructions'.format(recipe_id), filters)
         return response
 
 
+# Check if a multiple select field data is filled out or not
 def check_list(list_name):
     check_list = True
     if len(list_name) != 0:
@@ -140,6 +152,7 @@ def check_list(list_name):
         check_list = False
     return check_list
 
+# Adds item to pantry and returns pantry item data
 def addToPantry(ingredientName, user, intolerance):
     pantry = list(Pantry.objects.all())
     userpantry = list(UserToPantry.objects.filter(user=user))
@@ -190,6 +203,7 @@ def addToPantry(ingredientName, user, intolerance):
     })
     return data
 
+# searching recipes by ingredients, adds those in a database to reduce api call
 def prepare_simple_results(results):
     recipes = []
     found = []
@@ -351,6 +365,7 @@ def prepare_simple_results(results):
     data = {'recipes': found}
     return data
 
+# Searching recipes using complex method, adds them to database
 def prepare_advance_results(results):
     if len(results['results']) == 0:
         data = {'message': "No results. Try just searching without MyPantry items instead"}
@@ -433,6 +448,7 @@ def prepare_advance_results(results):
     response.status_code = 200
     return response
 
+# Converting units from metric to imperial if suitable
 def convertunit(name, unit, amount):
     metric_weight = ['g', 'kg']
     metric_volume = ['ml', 'l']
@@ -472,7 +488,8 @@ def convertunit(name, unit, amount):
             else:
                 result = api_client.convert(name, amount, unit, "cup")
     return result['answer']
-        
+
+# get similar recipes to id given, adds results to database        
 def get_similar_recipes(others):
     similar = []
     not_found = []
