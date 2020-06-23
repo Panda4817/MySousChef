@@ -35,6 +35,10 @@ class UserToPantry(models.Model):
             models.CheckConstraint(check=models.Q(
                 quantity__gt=0), name='quantity_gt_0')
         ]
+    
+    def is_valid_usertopantry(self):
+        return (self.quantity > 0)
+    
 # Store recipes from search results
 class Recipes(models.Model):
     api_id = models.PositiveIntegerField()

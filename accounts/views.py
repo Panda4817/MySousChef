@@ -28,7 +28,6 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db import transaction
 from django.conf import settings
 from django.core.mail import send_mail
-
 from .signals import show_login_message, show_logout_message
 from .forms import SignUpForm, ContactForm, ChangeUsernameForm, ChangeEmailForm
 from .tokens import account_activation_token
