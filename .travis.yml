@@ -5,7 +5,9 @@ install:
     - pip install -r requirements.txt
 before script:
     - sudo service postgresql start
-script: python manage.py test
+script:
+    - python manage.py collectstatic 
+    - python manage.py test
 deploy:
     provider: heroku
     api_key: $HEROKU_API_KEY
