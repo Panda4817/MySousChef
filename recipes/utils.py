@@ -347,7 +347,7 @@ def prepare_simple_results(results):
                     'likes': item.popularity
                 })
             for j in i['extendedIngredients']:
-                amount = j['metirc']['amount']
+                amount = j['metric']['amount']
                 unit = j['metric']['unitShort']
                 name = j['name']
                 if j['meta']:
