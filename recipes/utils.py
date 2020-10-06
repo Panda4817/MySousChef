@@ -311,6 +311,7 @@ def prepare_simple_results(results):
             not_found.append(i)
         check_found = False
     if len(not_found) > 0:
+        api_client = RecipeClient()
         results2 = api_client.get_recipe_bulk(not_found)
         for i in results2:
             try:
