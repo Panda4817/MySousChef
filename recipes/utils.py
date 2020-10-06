@@ -308,7 +308,7 @@ def prepare_simple_results(results):
                     })
                 check_found = True
         if check_found == False:
-            not_found.append(i)
+            not_found.append(str(i))
         check_found = False
     if len(not_found) > 0:
         api_client = RecipeClient()
