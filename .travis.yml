@@ -1,10 +1,8 @@
 language: python
 python: 3.9
+services:
+    - mysql
 install:
-    - sudo apt-get install postgresql-12
     - pip install -r requirements.txt
-before script:
-    - sudo service postgresql start
 script:
-    - python manage.py collectstatic
     - python manage.py test
