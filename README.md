@@ -2,19 +2,19 @@
 
 For my final project I created a website called MySousChef that lets you search for recipes, add your own recipes, add items to a virtual pantry and keep track of use by dates, best before dates, when a jar was opened and use within data. The website also lets you search for recipes by filtering for ingredients only in your virtual pantry. You can also create a vitual shopping list.
 
-This website is deployed using heroku:
-[heroku link](https://mysouschef.herokuapp.com/)
+This website is deployed using PythonAnywhere:
+[python anywhere link](http://mysouschef.eu.pythonanywhere.com/)
 
 ## This project uses
 
 - Python Django framework
-- Postgres SQL database
+- SQL database
 - Javascript
 - HTML
 - SCSS and CSS, using a colorlib template
 - Spoonacular API
-- deployed on Heroku
-- CI/Cl using travis
+- Deployed on PythonAnyWhere
+- CI/CD using travis
 - Database caching
 
 This project is broken down into 2 django apps working together: accounts and recipes.

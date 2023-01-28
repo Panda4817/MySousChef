@@ -1,16 +1,10 @@
 language: python
 python: 3.8
 install:
-    - sudo apt-get install postgresql-12 
+    - sudo apt-get install postgresql-12
     - pip install -r requirements.txt
 before script:
     - sudo service postgresql start
 script:
-    - python manage.py collectstatic 
+    - python manage.py collectstatic
     - python manage.py test
-deploy:
-    provider: heroku
-    api_key: $HEROKU_API_KEY
-    app: mysouschef
-    run: python manage.py migrate
-    on: master

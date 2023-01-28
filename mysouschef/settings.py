@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'mysouschef.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'mysouschef.eu.pythonanywhere.com']
 
 # Security settings
 SECURE_SSL_REDIRECT = True
@@ -52,8 +52,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    
-    
+
+
 ]
 
 MIDDLEWARE = [
@@ -66,13 +66,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware'    
+    'django.middleware.cache.FetchFromCacheMiddleware'
 ]
 
 # Cache settings
 
 CACHE_MIDDLEWARE_ALIAS = 'default'
-CACHE_MIDDLEWARE_SECONDS = 300 			
+CACHE_MIDDLEWARE_SECONDS = 300
 CACHE_MIDDLEWARE_KEY_PREFIX = 'mysouschef'
 
 
@@ -110,7 +110,7 @@ WSGI_APPLICATION = 'mysouschef.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': os.getenv('DATABASE_ENGINE'),
         'NAME': os.getenv('DATABASE_NAME'),
         'USER': os.getenv('DATABASE_USER'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
