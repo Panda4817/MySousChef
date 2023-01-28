@@ -1,14 +1,14 @@
-# CS50 Web 2020 Final Project
+# MySousChef
 
-For my final project I created a website called MySousChef that lets you search for recipes, add your own recipes, add items to a virtual pantry and keep track of use by dates, best before dates, when a jar was opened and use within data. The website also lets you search for recipes by filtering for ingredients only in your virtual pantry. You can also create a vitual shopping list.
+For my CS50 Web programming final project I created a website called MySousChef that lets you search for recipes, add your own recipes, add items to a virtual pantry and keep track of use by dates, best before dates, when a jar was opened and use within data. The website also lets you search for recipes by filtering for ingredients only in your virtual pantry. You can also create a vitual shopping list.
 
 This website is deployed using PythonAnywhere:
 [python anywhere link](http://mysouschef.eu.pythonanywhere.com/)
 
 ## This project uses
 
-- Python Django framework
-- SQL database
+- Python 3.10 Django 3.2 framework
+- SQL database (tested with both prostgres and mysql)
 - Javascript
 - HTML
 - SCSS and CSS, using a colorlib template
