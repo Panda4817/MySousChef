@@ -1,4 +1,4 @@
-Django==3.2.23
+Django==3.2.25
 python-dotenv
 gunicorn
 psycopg2
